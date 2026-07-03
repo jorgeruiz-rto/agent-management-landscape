@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent Management Competitive Landscape | Gravitee</title>
+<style>
+  :root{
+    --bg:#0A0705; --panel:#151009; --panel2:#1D1610; --line:#2C231A;
+    --ink:#EDE7E0; --ink2:#C9C0B6; --mut:#8C8177;
+    --grav:#FF5A2D; --grav2:#FF8A3D; --ember:#B33A12;
+    --apim:#E8A33D; --ain:#5FD3A5; --mod:#B48CF2; --hyp:#5EA8F5; --aigp:#F26D6D; --ctx:#4FC8D8;
+    --r:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+  ::selection{background:rgba(255,90,45,.35)}
+
+  .wrap{max-width:1360px;margin:0 auto;padding:0 24px 70px}
+
+  header{display:flex;align-items:center;gap:14px;padding:22px 0 6px;flex-wrap:wrap}
+  .glogo-h{width:46px;height:46px;object-fit:contain;filter:drop-shadow(0 0 14px rgba(255,90,45,.45))}
+  .htext .eyebrow{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--grav2);font-weight:700}
+  .htext h1{font-size:23px;font-weight:750;letter-spacing:-.015em}
+  .hspacer{flex:1}
+  .badge-int{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--mut);border:1px solid var(--line);border-radius:99px;padding:6px 12px}
+
+  nav.tabs{display:flex;gap:6px;margin:16px 0 20px;border-bottom:1px solid var(--line)}
+  .tab{background:none;border:none;color:var(--mut);font-size:14px;font-weight:650;padding:11px 16px;cursor:pointer;border-bottom:2px solid transparent}
+  .tab:hover{color:var(--ink2)}
+  .tab.on{color:var(--grav2);border-bottom-color:var(--grav)}
+  .tab:focus-visible{outline:2px solid var(--grav2);outline-offset:2px;border-radius:6px}
+
+  /* ===== MAP ===== */
+  /* Full-bleed map section: breaks out of the centered wrap so large screens get the whole width */
+  #view-map{width:100vw;position:relative;left:50%;margin-left:-50vw;padding:0 clamp(16px,2.5vw,40px)}
+  #view-map .overlapnote{max-width:1360px;margin-left:auto;margin-right:auto}
+  .mapbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+  .fly{background:var(--panel2);border:1px solid var(--line);color:var(--ink2);font-size:12px;font-weight:650;padding:7px 13px;border-radius:99px;cursor:pointer;display:inline-flex;align-items:center;gap:7px;transition:border-color .12s,color .12s}
+  .fly:hover{border-color:var(--tc,var(--grav));color:var(--ink)}
+  .fly i{width:8px;height:8px;border-radius:50%;background:var(--tc,var(--grav))}
+  .zbtn{background:var(--panel2);border:1px solid var(--line);color:var(--ink2);width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:16px;font-weight:700}
+  .zbtn:hover{border-color:var(--grav);color:var(--ink)}
+
+  .viewport{position:relative;height:clamp(520px,72vh,1040px);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;cursor:grab;background:
+    radial-gradient(1200px 700px at 50% 45%, rgba(255,90,45,.06), transparent 60%),
+    var(--bg);
+    touch-action:none;user-select:none}
+  .viewport.grabbing{cursor:grabbing}
+  .world{position:absolute;top:0;left:0;width:2600px;height:1600px;transform-origin:0 0;will-change:transform}
+  .world.anim{transition:transform .55s cubic-bezier(.3,.1,.2,1)}
+  svg.terr{position:absolute;inset:0;width:100%;height:100%}
+
+  .tlabel{position:absolute;transform:translate(-50%,-50%);text-align:center;pointer-events:none}
+  .tlabel h2{font-size:26px;font-weight:800;letter-spacing:.02em;color:var(--tc);opacity:.85;white-space:nowrap}
+  .tlabel .q{font-size:14px;font-style:italic;color:var(--tc);opacity:.6;margin-top:3px;white-space:nowrap}
+  .tlabel.gwlab h2{font-size:30px;color:var(--grav2);opacity:.75}
+  .tlabel.gwlab .q{color:var(--grav2);opacity:.5}
+
+  .node{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:7px;cursor:pointer}
+  .node:focus-visible{outline:2px solid var(--grav2);outline-offset:4px;border-radius:12px}
+  .ndisc{width:66px;height:66px;border-radius:50%;padding:3px;display:flex;box-shadow:0 4px 18px rgba(0,0,0,.55);transition:transform .14s;pointer-events:none}
+  .node:hover .ndisc{transform:scale(1.12)}
+  .ndisc .inner{flex:1;border-radius:50%;background:#F6F2EB;display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .ndisc img{width:64%;height:64%;object-fit:contain;display:block}
+  .nmono{display:none;width:100%;height:100%;align-items:center;justify-content:center;font-weight:800;font-size:19px;color:#fff;border-radius:50%}
+  .nlab{font-size:14.5px;font-weight:700;color:var(--ink);text-shadow:0 2px 8px rgba(0,0,0,.9);white-space:nowrap;pointer-events:none}
+  .nlab .gwmark{color:var(--grav2);font-size:11px;vertical-align:2px;margin-left:3px}
+  .nsub{font-size:11px;color:var(--mut);margin-top:-4px;white-space:nowrap;text-shadow:0 2px 6px rgba(0,0,0,.9);pointer-events:none}
+
+  .node.grav .ndisc{width:130px;height:130px;padding:4px;box-shadow:0 0 70px rgba(255,90,45,.45)}
+  .node.grav .inner{background:radial-gradient(circle at 40% 30%,#241109,#120A05)}
+  .node.grav .inner img{width:62%;height:62%}
+  .node.grav .nlab{font-size:20px}
+
+  .mapfoot{display:flex;gap:18px;flex-wrap:wrap;margin-top:12px;font-size:12px;color:var(--ink2);align-items:center}
+  .mapfoot span{display:inline-flex;align-items:center;gap:7px}
+  .dot{width:9px;height:9px;border-radius:50%;display:inline-block}
+  .mapfoot .hint{color:var(--mut)}
+
+  .overlapnote{margin-top:22px;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:18px 22px;font-size:13px;color:var(--ink2);line-height:1.65}
+  .overlapnote b{color:var(--ink)}
+
+  /* ===== POPUP ===== */
+  .scrim{position:fixed;inset:0;background:rgba(5,3,2,.6);backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:opacity .18s;z-index:40}
+  .scrim.on{opacity:1;pointer-events:auto}
+  .modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-46%) scale(.97);width:min(540px,94vw);max-height:88vh;overflow-y:auto;background:#141009;border:1px solid var(--line);border-radius:18px;z-index:50;padding:26px 26px 22px;opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;box-shadow:0 30px 90px rgba(0,0,0,.6)}
+  .modal.on{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
+  .dclose{position:absolute;top:16px;right:16px;background:var(--panel2);border:1px solid var(--line);color:var(--ink2);width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:15px}
+  .dclose:hover{color:var(--ink);border-color:var(--grav)}
+  .dhead{display:flex;align-items:center;gap:13px;margin-bottom:4px}
+  .dlogo{width:46px;height:46px;border-radius:50%;background:#F6F2EB;display:flex;align-items:center;justify-content:center;overflow:hidden;flex:0 0 46px}
+  .dlogo img{width:62%;height:62%;object-fit:contain}
+  .dlogo .nmono{font-size:16px}
+  .dlogo.dark{background:radial-gradient(circle at 40% 30%,#241109,#120A05);border:1px solid rgba(255,120,60,.5)}
+  .dhead h3{font-size:20px;font-weight:800;letter-spacing:-.015em}
+  .dtags{display:flex;gap:6px;flex-wrap:wrap;margin:9px 0 4px}
+  .dtag{font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;padding:4px 9px;border-radius:99px;border:1px solid}
+  .dquote{font-size:12.5px;font-style:italic;color:var(--grav2);margin:8px 0 14px}
+  .prow{display:grid;grid-template-columns:128px 1fr;gap:12px;padding:10px 0;border-top:1px solid var(--line);align-items:start}
+  .prow .pl{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--mut);font-weight:750;padding-top:2px}
+  .prow .pv{font-size:13px;line-height:1.55;color:var(--ink2)}
+  .prow .pv b{color:var(--ink)}
+  .azbadge{display:inline-block;font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:750;padding:3px 9px;border-radius:99px;border:1px solid;margin-bottom:6px}
+  .prow.gravrow{background:linear-gradient(135deg,rgba(255,90,45,.10),rgba(255,90,45,.03));border:1px solid rgba(255,90,45,.35);border-top:1px solid rgba(255,90,45,.35);border-radius:12px;padding:12px 14px;margin-top:10px}
+  .prow.gravrow .pl{color:var(--grav2)}
+  .prow.gravrow .pv{color:var(--ink)}
+  .dcta{width:100%;margin-top:14px;background:var(--grav);border:none;color:#fff;font-weight:750;font-size:14px;padding:12px;border-radius:10px;cursor:pointer}
+  .dcta:hover{background:var(--grav2)}
+
+  /* ===== COMPARE ===== */
+  .cmp-pick{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:20px 22px;margin-bottom:26px}
+  .cmp-pick h2{font-size:15px;font-weight:750;margin-bottom:4px}
+  .cmp-pick .sub{font-size:12.5px;color:var(--mut);margin-bottom:14px}
+  .pgroup{margin-bottom:12px}
+  .pgroup .gl{font-size:10px;letter-spacing:.16em;text-transform:uppercase;font-weight:750;margin-bottom:7px}
+  .pickrow{display:flex;flex-wrap:wrap;gap:8px}
+  .pchip{display:inline-flex;align-items:center;gap:7px;background:var(--panel2);border:1px solid var(--line);border-radius:99px;padding:5px 11px 5px 5px;font-size:12px;font-weight:600;color:var(--ink2);cursor:pointer;transition:border-color .12s,color .12s}
+  .pchip .plogo{width:22px;height:22px;border-radius:50%;background:#F6F2EB;display:flex;align-items:center;justify-content:center;overflow:hidden;flex:0 0 22px}
+  .pchip .plogo img{width:62%;height:62%;object-fit:contain}
+  .pchip .plogo .nmono{font-size:8px}
+  .pchip:hover{border-color:var(--grav)}
+  .pchip.sel{border-color:var(--grav);color:var(--ink);background:rgba(255,90,45,.13)}
+  .cmp-empty{text-align:center;color:var(--mut);font-size:14px;padding:60px 0;border:1px dashed var(--line);border-radius:var(--r)}
+
+  .cmp-scroll{overflow-x:auto;padding-bottom:8px}
+  table.cmp{border-collapse:separate;border-spacing:0;min-width:100%}
+  table.cmp th,table.cmp td{padding:14px 16px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line);font-size:13px;min-width:220px}
+  table.cmp th:first-child,table.cmp td:first-child{min-width:150px;max-width:170px;position:sticky;left:0;background:var(--bg);color:var(--mut);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:750;z-index:2}
+  table.cmp thead th{border-bottom:2px solid var(--line)}
+  .cmp-vh{display:flex;align-items:center;gap:10px}
+  .cmp-vh .plogo{width:32px;height:32px;border-radius:50%;background:#F6F2EB;display:flex;align-items:center;justify-content:center;overflow:hidden;flex:0 0 32px}
+  .cmp-vh .plogo img{width:62%;height:62%;object-fit:contain}
+  .cmp-vh .plogo .nmono{font-size:11px}
+  .cmp-vh .nm{font-size:15px;font-weight:750;color:var(--ink)}
+  .cmp-vh .sg{font-size:10.5px;color:var(--mut);font-weight:500;text-transform:none;letter-spacing:0}
+  td .txt{color:var(--ink2);line-height:1.6}
+  .score{display:flex;align-items:center;gap:9px}
+  .sbar{flex:1;height:6px;background:var(--panel2);border-radius:3px;overflow:hidden;max-width:130px}
+  .sbar i{display:block;height:100%;border-radius:3px;background:linear-gradient(90deg,var(--ember),var(--grav2))}
+  .snum{font-size:11px;color:var(--mut);font-variant-numeric:tabular-nums;width:26px}
+  .honest{background:rgba(242,109,109,.07);border-left:3px solid var(--aigp);padding:10px 12px;border-radius:0 8px 8px 0;color:var(--ink2);line-height:1.6}
+  .verdict{margin-top:26px;background:linear-gradient(135deg,rgba(255,90,45,.1),rgba(255,90,45,.03));border:1px solid rgba(255,90,45,.3);border-radius:var(--r);padding:20px 24px}
+  .verdict h3{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--grav2);margin-bottom:10px}
+  .verdict p{font-size:13.5px;line-height:1.7;color:var(--ink2)}
+
+  footer{margin-top:46px;font-size:11px;color:var(--mut);line-height:1.7;border-top:1px solid var(--line);padding-top:18px}
+
+  @media (max-width:760px){
+    .viewport{height:480px}
+    .tlabel h2{font-size:22px}
+    .prow{grid-template-columns:1fr;gap:4px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <img class="glogo-h" src="data:image/png;base64,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" alt="Gravitee">
+    <div class="htext">
+      <div class="eyebrow">Competitive Intelligence</div>
+      <h1>Agent Management Landscape</h1>
+    </div>
+    <div class="hspacer"></div>
+    <div class="badge-int">Internal · July 2026</div>
+  </header>
+
+  <nav class="tabs" role="tablist">
+    <button class="tab on" id="tab-map" role="tab" onclick="showView('map')">Landscape map</button>
+    <button class="tab" id="tab-cmp" role="tab" onclick="showView('cmp')">Compare vendors</button>
+  </nav>
+
+  <!-- ================= MAP ================= -->
+  <section id="view-map">
+    <div class="mapbar" id="mapbar">
+      <button class="fly" style="--tc:var(--grav)" onclick="flyHome()"><i></i>Overview</button>
+    </div>
+
+    <div class="viewport" id="vp">
+      <div class="world" id="world">
+        <svg class="terr" viewBox="0 0 2600 1600" xmlns="http://www.w3.org/2000/svg" id="terrsvg"></svg>
+        <div id="labels"></div>
+        <div id="nodes"></div>
+      </div>
+      <div style="position:absolute;right:14px;bottom:14px;display:flex;flex-direction:column;gap:6px;z-index:5">
+        <button class="zbtn" onclick="zoomBy(1.3)" aria-label="Zoom in">+</button>
+        <button class="zbtn" onclick="zoomBy(1/1.3)" aria-label="Zoom out">−</button>
+      </div>
+    </div>
+
+    <div class="mapfoot">
+      <span><i class="dot" style="background:var(--apim)"></i>API incumbents</span>
+      <span><i class="dot" style="background:var(--ain)"></i>AI-native &amp; open source</span>
+      <span><i class="dot" style="background:var(--mod)"></i>Model vendors</span>
+      <span><i class="dot" style="background:var(--hyp)"></i>Hyperscalers</span>
+      <span><i class="dot" style="background:var(--aigp)"></i>AI governance</span>
+      <span><i class="dot" style="background:var(--ctx)"></i>Data &amp; context economy</span>
+      <span style="color:var(--grav2)">◆ ships an AI gateway (Gartner, May 2026)</span>
+      <span class="hint">Drag to pan · scroll to zoom · click a vendor for its profile. The orange zone marks AI gateway providers and overlaps every front it touches.</span>
+    </div>
+
+    <div class="overlapnote">
+      <b>How to read the territory.</b> The orange center is the AI gateway zone: every vendor inside it ships an AI gateway, per Gartner's May 2026 vendor list, and the zone deliberately overlaps the API incumbents, the AI-natives, the hyperscalers, and the governance platforms, because that is where the $250M-to-$1B gateway market is being contested. Gravitee sits at its center as the only neutral, enterprise-grade plane spanning API, event, model, MCP, and agent traffic. <b>IBM</b> occupies a triple point: API incumbent, AIGP Leader, and gateway provider. <b>Airia</b> is the governance vendor that crossed into the zone with an MCP gateway. <b>Google and Microsoft</b> fight from the hyperscaler front with frontier models of their own, and the <b>model vendors</b> sit just outside the zone, building agent stacks that govern only themselves. The <b>data and context economy</b> on the western flank (Salesforce, Databricks, Snowflake, Confluent) owns the context agents consume, not the traffic between context, models, and agents. That traffic is the seam Gravitee claims.
+    </div>
+  </section>
+
+  <!-- ================= COMPARE ================= -->
+  <section id="view-cmp" style="display:none">
+    <div class="cmp-pick">
+      <h2>Build a comparison</h2>
+      <div class="sub">Select two to four vendors. Scores are directional 1 to 5 assessments for enablement discussion, grounded in the May and June 2026 Gartner research plus field intelligence. The read is deliberately honest, including on Gravitee.</div>
+      <div id="pickgrid"></div>
+    </div>
+    <div id="cmp-out"><div class="cmp-empty">Select at least two vendors above to compare them side by side.</div></div>
+  </section>
+
+  <footer>
+    Internal enablement asset. Gartner content (Magic Quadrant for AI Governance Platforms, June 2026; Market Overview for AI Gateways, May 2026) is referenced under subscription and requires citation approval before any external or public use. Vendor assessments reflect Gravitee PMM analysis and are directional, not benchmarks. Third-party logos load from public icon services and remain the property of their respective owners; a monogram is shown when a logo cannot load.
+  </footer>
+</div>
+
+<div class="scrim" id="scrim" onclick="closeModal()"></div>
+<div class="modal" id="modal" role="dialog" aria-modal="true"></div>
+
+<script>
+const GLOGO="data:image/png;base64,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";
+
+/* ================= DATA ================= */
+const SEGMETA = {
+  apim:{label:'API management incumbent',v:'--apim'},
+  ain:{label:'AI-native / open source',v:'--ain'},
+  mod:{label:'Model vendor',v:'--mod'},
+  hyp:{label:'Hyperscaler',v:'--hyp'},
+  aigp:{label:'AI governance platform',v:'--aigp'},
+  ctx:{label:'Data & context economy',v:'--ctx'},
+  grav:{label:'Neutral control plane',v:'--grav'}
+};
+const AZMETA={
+  native:{label:'Native engine',color:'--ain'},
+  partner:{label:'Partner / IdP-based',color:'--apim'},
+  platform:{label:'In-platform only',color:'--mod'},
+  byo:{label:'Bring your own',color:'--aigp'}
+};
+const cssv = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const segColor = s => cssv(SEGMETA[s].v);
+
+const TERR = {
+  apim:{name:'API management incumbents',quip:'"Bolt-on, not built-in."',cx:720,cy:470,rx:420,ry:280},
+  aigp:{name:'AI governance platforms',quip:'"Governance of record, not at runtime."',cx:1330,cy:240,rx:450,ry:210},
+  ain:{name:'AI-native & open source',quip:'"Built for the demo, not the board."',cx:1900,cy:450,rx:400,ry:280},
+  mod:{name:'Model vendors',quip:'"One model\u2019s walled garden."',cx:980,cy:1250,rx:400,ry:250},
+  hyp:{name:'Hyperscalers',quip:'"Lock-in dressed as convenience."',cx:1680,cy:1210,rx:400,ry:250},
+  ctx:{name:'Data & context economy',quip:'"They own the context, not the traffic."',cx:300,cy:880,rx:250,ry:540}
+};
+const GWZONE={cx:1330,cy:810,rx:720,ry:510};
+
+const V = {
+gravitee:{name:'Gravitee',m:'G',c:'#FF5A2D',segs:['grav'],x:1330,y:810,dom:'gravitee.io',slug:null,gw:true,sub:'Neutral control & security plane',
+ tag:'The neutral control and security plane. Enterprise-ready.',
+ pos:'One neutral plane governing API, event, model, MCP, and agent traffic. Gartner MQ Leader in API management.',
+ compete:'Lands with API, event, or AI gateway use cases, expands into agent management. Open source heritage, direct sales in NA and EMEA, strong sovereign and regulated-industry motion.',
+ str1:'Neutrality plus deployment freedom: no competing model, cloud, or SaaS agenda, deployable self-hosted, hybrid, or air-gapped.',
+ weak1:'Smaller brand and field presence than hyperscalers; agent management proof points still building.',
+ az:{t:'native',n:'Gravitee Access Management (OAuth/OIDC) plus the Authorization Management product line for fine-grained API and agent permissions.'},
+ angle:'Home turf. Win on neutrality, unified governance, and sovereignty; never try to out-model or out-bundle.',
+ origin:'API and event management platform, Lille, France (2015)',buyer:'Platform engineering, CISO, AI platform leads',
+ pricing:'Tiered platform pricing with pooled units across modules',
+ bottom:'Strongest neutrality and deployment story in the field, with real gateway maturity behind it. Needs to keep converting that into agent-specific proof before AI-native rivals grow up or incumbents catch up.',
+ s:{agent:4,neutral:5,deploy:5,gov:4,ent:4,dev:3}},
+
+kong:{name:'Kong',m:'K',c:'#169FCC',segs:['apim'],x:880,y:470,dom:'konghq.com',slug:'kong',gw:true,
+ tag:'Developer-darling gateway, now selling a SaaS platform.',
+ pos:'API platform extending into AI gateway through Konnect and plugins. Strongest developer brand among incumbents.',
+ compete:'Bottom-up open source adoption converted into Konnect subscriptions. Developer-led, cloud-first, loud marketing.',
+ str1:'Developer mindshare plus a high-performance, extensible gateway.',
+ weak1:'SaaS-first Konnect direction conflicts with strict sovereignty and self-hosted requirements.',
+ az:{t:'partner',n:'OAuth/OIDC enforcement via plugins; identity and fine-grained authorization come from partner IdPs (Okta, Auth0, Keycloak).'},
+ angle:'Match gateway maturity; win on sovereignty, event-native workloads, and cost at scale.',
+ origin:'Open source API gateway, San Francisco',buyer:'Developers and platform teams, then central IT',
+ pricing:'Konnect SaaS tiers plus enterprise licensing; usage dimensions add up',
+ bottom:'The most dangerous incumbent competitor on developer sentiment and speed of announcement. Beatable on sovereignty, event-native workloads, and total cost as usage scales.',
+ s:{agent:4,neutral:4,deploy:3,gov:3,ent:4,dev:5}},
+
+tyk:{name:'Tyk',m:'T',c:'#B8332E',segs:['apim'],x:740,y:590,dom:'tyk.io',slug:null,gw:true,
+ tag:'The self-hosted pragmatist.',
+ pos:'Self-hosted API management for buyers who prioritize ownership and cost control, with Tyk AI Studio layered on.',
+ compete:'Open source funnel into self-managed enterprise licenses. EMEA-strong, pragmatic pricing.',
+ str1:'Genuine self-hosting flexibility at a fair price.',
+ weak1:'Thin AI and agent roadmap; limited governance depth and company scale.',
+ az:{t:'partner',n:'Basic built-in OAuth; anything advanced delegates to external identity providers.'},
+ angle:'Respect the self-hosting overlap; win on platform breadth and agent depth.',
+ origin:'Open source API gateway, London',buyer:'Cost- and control-conscious platform teams, EMEA mid-enterprise',
+ pricing:'Self-managed licenses, comparatively transparent',
+ bottom:'A fair, likable competitor for classic API management deals, rarely the finalist for a strategic agent platform decision.',
+ s:{agent:2,neutral:4,deploy:5,gov:2,ent:3,dev:3}},
+
+wso2:{name:'WSO2',m:'W',c:'#E67E22',segs:['apim'],x:880,y:690,dom:'wso2.com',slug:'wso2',gw:true,
+ tag:'The full middleware suite, now under new ownership.',
+ pos:'Full middleware suite: APIs, integration, and identity from one vendor, with AI arriving as a suite refresh.',
+ compete:'Suite deals into APAC and public sector on open source credibility; EQT ownership pushing consolidation.',
+ str1:'Identity depth (Identity Server, Asgardeo) that matters for agent access control.',
+ weak1:'Complexity and slow release cadence against AI-native pace.',
+ az:{t:'native',n:'Native via WSO2 Identity Server and Asgardeo, a full IAM product inside the same suite.'},
+ angle:'Win on focus, velocity, and modern platform experience.',
+ origin:'Open source middleware, Colombo and Santa Clara',buyer:'Suite-oriented enterprise IT, APAC and public sector',
+ pricing:'Subscription per deployment, suite bundling',
+ bottom:'Encountered in suite consolidations more than in agent management evaluations. Slow but not gone.',
+ s:{agent:2,neutral:4,deploy:4,gov:3,ent:3,dev:3}},
+
+ibm:{name:'IBM',m:'IBM',c:'#2469C8',segs:['apim','aigp'],x:1080,y:370,dom:'ibm.com',slug:'ibm',gw:true,sub:'Triple point: APIs, governance, gateway',
+ tag:'The only vendor standing in both categories at once.',
+ pos:'API Connect and webMethods on the gateway side, watsonx.governance as an AIGP MQ Leader. The full governed-AI story for regulated giants.',
+ compete:'Top-down ELA and services-led selling to regulated enterprises and the public sector, governance-first narrative.',
+ str1:'Viability, global reach, and regulated-industry depth nobody questions.',
+ weak1:'Heavy implementation effort and slow time to value (Gartner caution); the unified experience is assembled, not native.',
+ az:{t:'native',n:'Native through IBM Security Verify, sold as a separate product in the portfolio.'},
+ angle:'Be the unified, product-led alternative to an IBM integration project.',
+ origin:'Enterprise IT incumbent, Armonk',buyer:'CIO, risk and compliance leadership, regulated global enterprises',
+ pricing:'Enterprise agreements, services-heavy; premium TCO',
+ bottom:'The safest throat to choke for a Fortune 100 risk officer, and the slowest path to a working agent platform. Both statements are true.',
+ s:{agent:3,neutral:3,deploy:4,gov:5,ent:5,dev:2}},
+
+mulesoft:{name:'MuleSoft',m:'M',c:'#00A0DF',segs:['apim'],x:1010,y:580,dom:'mulesoft.com',slug:'mulesoft',gw:true,
+ tag:'Salesforce integration arm, pulled into the Agentforce orbit.',
+ pos:'Anypoint and Flex Gateway for APIs, increasingly positioned as the integration layer feeding Salesforce Agentforce.',
+ compete:'Sold through the Salesforce field into the CRM installed base; Agentforce-first story with MuleSoft as plumbing.',
+ str1:'Salesforce reach and a large enterprise integration footprint.',
+ weak1:'Cost and renewal friction; neutrality is the opposite of the strategy.',
+ az:{t:'platform',n:'Leans on Salesforce identity and external IdPs; no standalone authorization engine of its own.'},
+ angle:'Displacement: cost, openness, and agents that span more than one ecosystem.',
+ origin:'Integration platform, acquired by Salesforce 2018',buyer:'Salesforce-aligned IT and integration teams',
+ pricing:'Premium subscription, frequent renewal escalation',
+ bottom:'Formidable where Salesforce owns the account, structurally uninterested in neutrality everywhere else. High-quality displacement target.',
+ s:{agent:2,neutral:3,deploy:3,gov:3,ent:4,dev:3}},
+
+litellm:{name:'LiteLLM',m:'L',c:'#3B82F6',segs:['ain'],x:1710,y:400,dom:'litellm.ai',slug:null,gw:true,
+ tag:'The default open source LLM proxy.',
+ pos:'Open source LLM proxy: one API across 100+ model providers, with keys, budgets, and logging.',
+ compete:'GitHub to production, then a paid enterprise tier. Often already inside the account before any evaluation starts.',
+ str1:'Model coverage and adoption velocity nobody matches.',
+ weak1:'Thin governance, security, and support for mission-critical use (Gartner\u2019s open source caution applies directly).',
+ az:{t:'byo',n:'Virtual keys and budgets only; identity and authorization are bring-your-own.'},
+ angle:'"Great for the pilot": Gravitee is where the proof of concept graduates.',
+ origin:'Open source project turned startup, San Francisco',buyer:'Individual dev and AI platform teams',
+ pricing:'Open source core, paid enterprise tier',
+ bottom:'Wins the first ninety days of almost every internal AI platform journey. Rarely survives the first serious security review as the long-term answer.',
+ s:{agent:3,neutral:5,deploy:4,gov:2,ent:2,dev:5}},
+
+portkey:{name:'Portkey',m:'P',c:'#7C5CFC',segs:['ain'],x:1840,y:495,dom:'portkey.ai',slug:null,gw:true,
+ tag:'The polished AI-native gateway.',
+ pos:'The most complete pure-play AI gateway: routing, guardrails, prompt management, observability.',
+ compete:'Product-led SaaS aimed at AI engineers, moving upmarket into platform team deals.',
+ str1:'Developer experience and feature cadence.',
+ weak1:'Startup viability and thin compliance certifications for a control plane bet.',
+ az:{t:'partner',n:'SaaS RBAC and key management; enterprise identity via external SSO providers.'},
+ angle:'Match the feature list, then shift to sovereignty, estate-wide governance, and vendor durability.',
+ origin:'AI gateway startup, San Francisco',buyer:'AI engineering and platform teams',
+ pricing:'SaaS tiers, usage-based',
+ bottom:'The best pure-play product in the segment. The question buyers keep asking is not about features, it is about betting a control plane on a young startup.',
+ s:{agent:4,neutral:5,deploy:3,gov:3,ent:2,dev:4}},
+
+solo:{name:'Solo.io',m:'S',c:'#A855F7',segs:['ain'],x:1710,y:545,dom:'solo.io',slug:null,gw:true,
+ tag:'The Envoy specialists moving fastest on agent infrastructure.',
+ pos:'Gloo platform on Envoy, with agentgateway and serious early investment in MCP and A2A traffic.',
+ compete:'Sells to cloud-native platform teams on Envoy and CNCF credibility; open source feeds commercial adoption.',
+ str1:'Technical depth on MCP and A2A traffic management.',
+ weak1:'Infra-only buying center; governance and compliance stakeholders are a stretch.',
+ az:{t:'partner',n:'Strong enforcement hooks (Envoy ext-auth), but the authorization decision engine is external.'},
+ angle:'Differentiate up-stack: governance the CISO can operate, plus APIs and events.',
+ origin:'Cloud-native networking, Cambridge MA',buyer:'Platform and infrastructure engineering',
+ pricing:'Commercial platform on open source core',
+ bottom:'If the buyer is a Kubernetes-fluent platform team, Solo is a real threat. The moment governance and non-infra stakeholders enter the room, the field tilts back.',
+ s:{agent:4,neutral:4,deploy:4,gov:3,ent:3,dev:4}},
+
+envoyai:{name:'Envoy AI Gateway',m:'E',c:'#E85D9E',segs:['ain'],x:1860,y:610,dom:'envoyproxy.io',slug:'envoyproxy',gw:true,
+ tag:'The neutral substrate everyone else builds on.',
+ pos:'Open source CNCF-aligned AI gateway project on Envoy Proxy; the substrate under many commercial products.',
+ compete:'Community-driven; commercial support arrives through vendors like Tetrate and Solo, not the project.',
+ str1:'Neutral, performant, free foundation.',
+ weak1:'No product, support contract, or governance tooling: assembly required.',
+ az:{t:'byo',n:'ext_authz filter only: you wire in your own identity and policy engine.'},
+ angle:'Price Gravitee against the fully loaded cost of build-it-yourself.',
+ origin:'Open source project (Envoy ecosystem)',buyer:'Engineering teams choosing to build',
+ pricing:'Free, plus the engineering payroll to make it enterprise-grade',
+ bottom:'Excellent raw material, not a solution. The competitor here is the internal build decision, and time usually wins that argument for buy.',
+ s:{agent:3,neutral:5,deploy:5,gov:1,ent:1,dev:4}},
+
+truefoundry:{name:'TrueFoundry',m:'TF',c:'#4A7DFF',segs:['ain'],x:1985,y:680,dom:'truefoundry.com',slug:null,gw:true,
+ tag:'The Kubernetes-native ML platform with a gateway attached.',
+ pos:'ML and LLMOps platform with an AI gateway component, strong on Kubernetes-native deployment.',
+ compete:'Sells to ML platform teams; the gateway rides a broader MLOps platform pitch.',
+ str1:'Kubernetes-native deployment and inference depth.',
+ weak1:'Gateway is a feature, not a control plane; narrow buying center.',
+ az:{t:'partner',n:'Platform RBAC with SSO delegated to external identity providers.'},
+ angle:'Contrast estate-wide governance against an MLOps toolchain.',
+ origin:'MLOps platform startup, San Francisco',buyer:'ML platform engineering teams',
+ pricing:'Platform subscription',
+ bottom:'A sensible choice for teams whose center of gravity is model operations, not a contender for the enterprise-wide agent control plane.',
+ s:{agent:3,neutral:4,deploy:4,gov:2,ent:3,dev:3}},
+
+openai:{name:'OpenAI',m:'O',c:'#10A37F',segs:['mod'],x:850,y:1265,dom:'openai.com',slug:'openai',gw:false,
+ tag:'The gravitational center of the model market, building its own walls.',
+ pos:'Frontier model leader building an agent stack (Agents SDK, enterprise tooling) around its own platform.',
+ compete:'Product-led at planetary scale plus a fast-growing enterprise motion; agent tooling deepens token consumption.',
+ str1:'Model quality and default-choice developer pull.',
+ weak1:'Governs only its own usage; neutrality is structurally absent.',
+ az:{t:'platform',n:'Keys, orgs, and roles inside its own platform; nothing for the rest of your estate.'},
+ angle:'Govern it, do not compete with it: neutral control over OpenAI plus everything else.',
+ origin:'Frontier AI lab, San Francisco',buyer:'Everyone, from individual devs to boards',
+ pricing:'Consumption per token plus enterprise tiers',
+ bottom:'A dependency to be governed, not a control plane. The more an enterprise loves OpenAI, the more it needs a neutral layer in front of it.',
+ s:{agent:4,neutral:1,deploy:2,gov:2,ent:3,dev:5}},
+
+anthropic:{name:'Anthropic',m:'A',c:'#D97757',segs:['mod'],x:1065,y:1360,dom:'anthropic.com',slug:'anthropic',gw:false,
+ tag:'The safety-positioned model vendor that created MCP.',
+ pos:'Frontier model vendor behind Claude and originator of MCP, the protocol the gateway market now races to manage.',
+ compete:'Enterprise and API-led growth on a trust and safety narrative that lands in regulated accounts.',
+ str1:'MCP authorship shapes the protocol layer everyone else adapts to.',
+ weak1:'One model family; cross-vendor governance is not its business.',
+ az:{t:'platform',n:'Platform keys and workspace roles; estate-wide authorization is out of scope.'},
+ angle:'Complementary: Gravitee makes MCP-heavy Anthropic estates governable.',
+ origin:'Frontier AI lab, San Francisco',buyer:'Enterprises with safety and reliability priorities, developers',
+ pricing:'Consumption per token plus enterprise tiers',
+ bottom:'The most governance-sympathetic model vendor, and still a model vendor. Its MCP standard is an opportunity for Gravitee, not a threat.',
+ s:{agent:4,neutral:1,deploy:2,gov:3,ent:4,dev:5}},
+
+mistral:{name:'Mistral',m:'M',c:'#F2A73B',segs:['mod'],x:795,y:1350,dom:'mistral.ai',slug:'mistralai',gw:false,
+ tag:'Europe\u2019s sovereignty champion in the model race.',
+ pos:'French frontier model vendor with open weights and a growing platform, selling European sovereignty first.',
+ compete:'Sovereignty-led sales into EU enterprises and public sector, with open-weight community goodwill.',
+ str1:'Credible self-hosted, European model story with real procurement tailwinds.',
+ weak1:'Platform breadth and governance tooling trail the leaders.',
+ az:{t:'platform',n:'Platform keys and workspace roles; broader authorization is out of scope.'},
+ angle:'Ally in the sovereign stack; compete only where AI Studio creeps into gateway turf.',
+ origin:'Frontier AI lab, Paris',buyer:'European enterprises and public sector',
+ pricing:'Consumption plus platform tiers, open weights free',
+ bottom:'An ally in the sovereign narrative and a competitor only at the edges. Watch AI Studio scope creep into gateway territory.',
+ s:{agent:3,neutral:2,deploy:4,gov:2,ent:3,dev:3}},
+
+aws:{name:'AWS',m:'AWS',c:'#F29111',segs:['hyp'],x:1810,y:1150,dom:'aws.amazon.com',slug:null,gw:true,
+ tag:'The everything store, inside one cloud\u2019s walls.',
+ pos:'Bedrock, AgentCore, and API Gateway: everything for agents, models, and APIs, inside one cloud.',
+ compete:'Consumption economics, credits, and enterprise agreements make AWS the default answer.',
+ str1:'Breadth and enterprise machinery at full scale.',
+ weak1:'Neutrality ends at the AWS boundary; cross-cloud governance is not the design goal.',
+ az:{t:'native',n:'Native and deep (IAM, Cognito, Verified Permissions), but scoped to the AWS boundary.'},
+ angle:'Attack the boundary: multi-cloud, multi-model, hybrid reality.',
+ origin:'Hyperscale cloud, Seattle',buyer:'Cloud-committed enterprises, CTO and platform org',
+ pricing:'Consumption, credits, and enterprise agreements',
+ bottom:'Unbeatable inside its own gravity, structurally incapable of neutrality outside it. Compete at the boundary, never in the center.',
+ s:{agent:4,neutral:2,deploy:3,gov:3,ent:5,dev:4}},
+
+google:{name:'Google',m:'G',c:'#4285F4',segs:['hyp','mod'],x:1300,y:1140,dom:'cloud.google.com',slug:'google',gw:true,sub:'Cloud + Gemini',
+ tag:'Hyperscaler and model vendor in one, with the oldest API asset in the game.',
+ pos:'Apigee, Vertex AI, Gemini, and A2A authorship: hyperscaler and model vendor at once.',
+ compete:'GCP consumption plus the mature Apigee enterprise base; A2A stewardship at the agent collaboration layer.',
+ str1:'Apigee maturity plus an in-house frontier model.',
+ weak1:'Referee and player simultaneously; Apigee and Vertex remain separate worlds.',
+ az:{t:'native',n:'Native Cloud IAM plus Apigee policies, scoped to Google Cloud.'},
+ angle:'Neutrality wedge: support A2A and MCP without a model biasing every routing decision.',
+ origin:'Hyperscale cloud and AI lab, Mountain View',buyer:'GCP-committed enterprises, data-centric orgs',
+ pricing:'Consumption plus Apigee licensing',
+ bottom:'Individually strong pieces, structurally conflicted whole. The neutrality argument writes itself.',
+ s:{agent:4,neutral:2,deploy:3,gov:3,ent:5,dev:4}},
+
+microsoft:{name:'Microsoft',m:'MS',c:'#5EA8F5',segs:['hyp','mod'],x:1420,y:1290,dom:'microsoft.com',slug:null,gw:true,sub:'Azure + OpenAI axis',
+ tag:'The enterprise default, selling convenience by the seat and the token.',
+ pos:'Azure APIM with AI gateway features, AI Foundry, Copilot Studio, and the OpenAI axis: the widest enterprise distribution in the market.',
+ compete:'EA-driven bundling and M365 pull make "just use Azure" the path of least resistance for CIOs.',
+ str1:'Distribution and enterprise trust nobody matches.',
+ weak1:'Azure and OpenAI-family defaults; EU sovereignty scrutiny lands hardest on the most-deployed hyperscaler.',
+ az:{t:'native',n:'Entra ID, the strongest native identity stack in the market, optimized for the Microsoft estate.'},
+ angle:'The neutral governance layer over a Microsoft-heavy estate, with sovereignty options Redmond cannot match.',
+ origin:'Hyperscale cloud and software incumbent, Redmond',buyer:'CIO, EA holders, the entire enterprise mainstream',
+ pricing:'EA bundling, consumption, per-seat Copilot',
+ bottom:'Wins by default wherever no one makes the neutrality argument. Making that argument early is the whole job.',
+ s:{agent:4,neutral:2,deploy:3,gov:3,ent:5,dev:4}},
+
+airia:{name:'Airia',m:'Ai',c:'#F26D6D',segs:['aigp'],x:1330,y:340,dom:'airia.com',slug:null,gw:true,sub:'Governance crossing into the zone',
+ tag:'The governance vendor that built a gateway.',
+ pos:'AIGP Visionary enforcing governance in-line through an AI/MCP gateway, with EU AI Act and NIST AI RMF automation.',
+ compete:'Sells runtime enforcement to AI governance leads and CISOs, North America first with early EU expansion.',
+ str1:'Real runtime enforcement plus agent security depth (prompt injection defense, red teaming).',
+ weak1:'Young company; the gateway serves governance, not production traffic at scale.',
+ az:{t:'partner',n:'Native runtime policy engine; identity federates from the enterprise IdP.'},
+ angle:'Own the enforcement-plane language first; Gravitee brings production-grade traffic management to the same convergence.',
+ origin:'AI governance startup, North America',buyer:'AI governance leads, CISO',
+ pricing:'Platform subscription',
+ bottom:'Small today, directionally important. Where Airia shows up, the account has budget for exactly what Gravitee sells.',
+ s:{agent:4,neutral:4,deploy:3,gov:5,ent:3,dev:2}},
+
+servicenow:{name:'ServiceNow',m:'SN',c:'#62D84E',segs:['aigp'],x:1150,y:180,dom:'servicenow.com',slug:null,gw:false,
+ tag:'Governance as a workflow, sold to the enterprise it already runs.',
+ pos:'AI Control Tower, an AIGP MQ Leader: AI risk and compliance managed as ServiceNow workflows.',
+ compete:'Expands from its huge ITSM and GRC installed base with policy packs and certifications.',
+ str1:'Enterprise viability, out-of-the-box EU AI Act and NIST content, deep certifications.',
+ weak1:'No continuous real-time risk monitoring, and extra charges to govern AI outside ServiceNow (Gartner cautions).',
+ az:{t:'partner',n:'Platform RBAC; agent identity arriving via Veza and Moveworks partnerships.'},
+ angle:'Coexist: they hold the register, Gravitee enforces at runtime.',
+ origin:'Workflow platform incumbent, Santa Clara',buyer:'GRC, risk, and IT leadership',
+ pricing:'Premium platform pricing; extra charges for non-ServiceNow AI use cases',
+ bottom:'Owns the paperwork layer of AI governance in its accounts. The runtime layer is still open, which is exactly where Gravitee lives.',
+ s:{agent:2,neutral:3,deploy:3,gov:5,ent:5,dev:2}},
+
+credo:{name:'Credo AI',m:'C',c:'#E86A9A',segs:['aigp'],x:1090,y:290,dom:'credo.ai',slug:null,gw:false,
+ tag:'The policy brain looking for enforcement arms.',
+ pos:'AIGP Visionary: governance as an operational workflow with intake, contextual risk scoring, and policy packs.',
+ compete:'Sells to AI governance leaders and CDAOs, deliberately not chasing every security persona.',
+ str1:'Contextual risk scoring and governance workflow design.',
+ weak1:'Buyers need additional tools for AI security and agent enforcement (Gartner caution).',
+ az:{t:'partner',n:'Governance workflows integrate with enterprise IAM; no enforcement-grade engine.'},
+ angle:'Partner-shaped: they define policy, a gateway enforces it.',
+ origin:'AI governance startup, North America',buyer:'AI governance leaders, CDAO',
+ pricing:'Platform subscription',
+ bottom:'Smart platform, deliberately incomplete at runtime. Partner-shaped in most accounts.',
+ s:{agent:2,neutral:4,deploy:2,gov:4,ent:3,dev:2}},
+
+onetrust:{name:'OneTrust',m:'OT',c:'#6DC24B',segs:['aigp'],x:1510,y:290,dom:'onetrust.com',slug:null,gw:false,
+ tag:'Privacy incumbent annexing AI governance.',
+ pos:'Privacy incumbent extending into AI inventory, risk classification, and EU AI Act / NIST / ISO 42001 assessments.',
+ compete:'AI governance as an expansion SKU across a very large privacy installed base in NA, Europe, and APAC.',
+ str1:'Regulatory content at scale and unusual geographic breadth.',
+ weak1:'Heavy manual implementation burden behind a simple-looking surface (Gartner caution).',
+ az:{t:'partner',n:'Integrates enterprise IAM; agent credentialing still on the roadmap per Gartner.'},
+ angle:'Registry strength, runtime gap: integrate, coexist, own enforcement.',
+ origin:'Privacy tech incumbent, Atlanta',buyer:'Privacy, compliance, and risk teams',
+ pricing:'Module-based subscription on the trust platform',
+ bottom:'Will be present in every regulated account\u2019s governance discussion. Almost never in the runtime one.',
+ s:{agent:2,neutral:3,deploy:3,gov:4,ent:4,dev:2}},
+
+truyo:{name:'Truyo',m:'Tr',c:'#F2916D',segs:['aigp'],x:1560,y:170,dom:'truyo.com',slug:null,gw:false,
+ tag:'The quiet Leader selling through channels.',
+ pos:'AIGP MQ Leader focused on AI inventory, impact assessments, and audit-ready evidence for regulated buyers.',
+ compete:'Channel-driven (70 percent-plus) into healthcare, financial services, and government.',
+ str1:'Inaugural MQ Leader with native shadow AI and agent discovery.',
+ weak1:'No in-line blocking; governance-centric enforcement only (Gartner caution).',
+ az:{t:'partner',n:'Relies on customer IAM and platform controls; no in-line engine.'},
+ angle:'Proof that even governance Leaders lack the runtime layer Gravitee provides.',
+ origin:'AI governance vendor, North America',buyer:'Regulated-industry compliance teams via channel',
+ pricing:'Subscription via channel partners',
+ bottom:'A Leader by governance criteria, invisible at the traffic layer. Useful ammunition for the convergence narrative.',
+ s:{agent:1,neutral:3,deploy:2,gov:4,ent:3,dev:1}},
+
+salesforce:{name:'Salesforce',m:'SF',c:'#00A1E0',segs:['ctx','apim'],x:480,y:560,dom:'salesforce.com',slug:'salesforce',gw:false,sub:'Agentforce + Data Cloud + MuleSoft',
+ tag:'The CRM giant turning customer data into agent context.',
+ pos:'Agentforce for agents, Data Cloud for context, MuleSoft for APIs: agents grounded in the customer data it already owns.',
+ compete:'The largest enterprise field force selling Agentforce consumption into the installed base; its gateway play runs through MuleSoft.',
+ str1:'Customer data gravity and board-level Agentforce mindshare.',
+ weak1:'Agents scoped to its ecosystem; neutrality is the opposite of the strategy.',
+ az:{t:'platform',n:'Deep native identity and permissioning, all of it inside Salesforce.'},
+ angle:'Contain: govern Agentforce as one estate among many; MuleSoft displacement opens the door.',
+ origin:'CRM and enterprise SaaS incumbent, San Francisco',buyer:'CRO-adjacent IT, existing Salesforce estates',
+ pricing:'Subscription plus Agentforce consumption credits; premium',
+ bottom:'A context superpower with zero interest in neutrality. Not a gateway rival in most deals, but its agents multiply the traffic that needs neutral governance.',
+ s:{agent:3,neutral:1,deploy:2,gov:3,ent:5,dev:3}},
+
+databricks:{name:'Databricks',m:'DB',c:'#FF3621',segs:['ctx'],x:270,y:1090,dom:'databricks.com',slug:'databricks',gw:false,
+ tag:'The data intelligence platform racing to own AI context.',
+ pos:'Lakehouse plus Mosaic AI and Unity Catalog: the strongest engineering brand in the context economy.',
+ compete:'Consumption land-and-expand on data workloads, then AI and agents where the data already sits.',
+ str1:'Data plus AI unification with real engineering credibility.',
+ weak1:'Governs data and models at rest, not agent traffic in motion.',
+ az:{t:'native',n:'Unity Catalog is a genuine native authorization layer, scoped to data and AI assets in the lakehouse.'},
+ angle:'Partner-shaped: they curate the context, Gravitee governs the traffic.',
+ origin:'Data and AI platform, San Francisco',buyer:'Data engineering and AI platform teams, CDO',
+ pricing:'Consumption (DBUs), enterprise commitments',
+ bottom:'Owns more of the context layer every quarter. The gap between governing data at rest and governing agent traffic in motion is exactly where a gateway lives.',
+ s:{agent:3,neutral:3,deploy:3,gov:3,ent:5,dev:4}},
+
+snowflake:{name:'Snowflake',m:'SN',c:'#29B5E8',segs:['ctx'],x:390,y:1260,dom:'snowflake.com',slug:'snowflake',gw:false,
+ tag:'The data cloud selling AI where the data already lives.',
+ pos:'Data cloud with Cortex AI: bring the models to the data, never move the data.',
+ compete:'Consumption expansion inside a sticky installed base; governance-by-containment pitch to CIOs.',
+ str1:'Enterprise data trust and ease of adoption.',
+ weak1:'Agents and models bounded by the Snowflake perimeter by design.',
+ az:{t:'native',n:'Native RBAC on data, strictly within the Snowflake perimeter.'},
+ angle:'Complementary: govern how agents reach Snowflake context and everything else.',
+ origin:'Cloud data platform, Bozeman and San Mateo',buyer:'Data teams, CIO, analytics leadership',
+ pricing:'Consumption credits; costs climb with AI usage',
+ bottom:'The most contained vision of the context economy. Great inside the perimeter, silent about the agent traffic outside it.',
+ s:{agent:3,neutral:2,deploy:2,gov:3,ent:5,dev:3}},
+
+confluent:{name:'Confluent',m:'CF',c:'#173361',segs:['ctx'],x:330,y:860,dom:'confluent.io',slug:null,gw:false,sub:'Context in motion',
+ tag:'Kafka\u2019s commercial steward, streaming context in motion.',
+ pos:'The company behind Kafka, positioning real-time streams as the context layer agents actually need.',
+ compete:'Open source Kafka funnel into Confluent Cloud consumption, with a "context in motion" AI narrative and Flink depth.',
+ str1:'Ownership of the Kafka ecosystem plus real-time processing depth.',
+ weak1:'Stream governance overlaps Gravitee\u2019s Kafka-native event management, where it meets a direct competitor.',
+ az:{t:'native',n:'Native RBAC and ACLs for streams; nothing for agent or model traffic.'},
+ angle:'One plane for streams, APIs, and agents, which Confluent does not offer.',
+ origin:'Streaming platform, Kafka creators, Mountain View',buyer:'Data infrastructure and platform teams',
+ pricing:'Consumption on Confluent Cloud, self-managed licenses',
+ bottom:'Owns the streams that will feed the agent economy. The one context player Gravitee also meets as a straight competitor, on Kafka governance.',
+ s:{agent:2,neutral:3,deploy:3,gov:3,ent:4,dev:4}}
+};
+
+/* ================= MAP RENDER ================= */
+const WORLD_W=2600, WORLD_H=1600;
+const GX=V.gravitee.x, GY=V.gravitee.y;
+
+function drawTerritories(){
+  const svg=document.getElementById('terrsvg');
+  let s='';
+  for(const k in TERR){const t=TERR[k];s+=`<line x1="${GX}" y1="${GY}" x2="${t.cx}" y2="${t.cy}" stroke="${segColor(k)}" stroke-opacity="0.10" stroke-width="2" stroke-dasharray="3 9"/>`;}
+  for(const k in TERR){
+    const t=TERR[k], c=segColor(k);
+    s+=`<ellipse cx="${t.cx}" cy="${t.cy}" rx="${t.rx}" ry="${t.ry}" fill="${c}" fill-opacity="0.055" stroke="${c}" stroke-opacity="0.35" stroke-width="1.5" stroke-dasharray="7 7"/>`;
+  }
+  // AI Gateway zone, drawn last so its edge reads on top of territory fills
+  s+=`<ellipse cx="${GWZONE.cx}" cy="${GWZONE.cy}" rx="${GWZONE.rx}" ry="${GWZONE.ry}" fill="${cssv('--grav')}" fill-opacity="0.05" stroke="${cssv('--grav')}" stroke-opacity="0.5" stroke-width="2" stroke-dasharray="12 8"/>`;
+  s+=`<circle cx="${GX}" cy="${GY}" r="210" fill="none" stroke="rgba(255,90,45,.22)" stroke-dasharray="4 10"/>`;
+  svg.innerHTML=s;
+
+  const labels=document.getElementById('labels');
+  let lh=Object.entries(TERR).map(([k,t])=>{
+    const dy = t.cy < GY ? -t.ry+52 : t.ry-52;
+    return `<div class="tlabel" style="left:${t.cx}px;top:${t.cy+dy}px;--tc:${segColor(k)}"><h2>${t.name}</h2><div class="q">${t.quip}</div></div>`;
+  }).join('');
+  lh+=`<div class="tlabel gwlab" style="left:${GWZONE.cx-430}px;top:${GWZONE.cy+180}px"><h2>AI Gateway zone</h2><div class="q">Every vendor inside ships a gateway.</div></div>`;
+  labels.innerHTML=lh;
+}
+
+function logoImg(v){
+  if(!v.dom && !v.slug) return `<span class="nmono" style="display:flex;background:${v.c}">${v.m}</span>`;
+  const fav=`https://www.google.com/s2/favicons?domain=${v.dom}&sz=128`;
+  const first=v.slug?`https://cdn.simpleicons.org/${v.slug}`:fav;
+  const step=v.slug?0:1;
+  return `<img src="${first}" data-fav="${fav}" data-step="${step}" alt="" loading="lazy" onerror="logoErr(this)"><span class="nmono" style="background:${v.c}">${v.m}</span>`;
+}
+function logoErr(img){
+  if(img.dataset.step==='0'){img.dataset.step='1';img.src=img.dataset.fav;return;}
+  img.style.display='none';
+  const m=img.nextElementSibling; if(m) m.style.display='flex';
+}
+function ringStyle(v){
+  if(v.segs[0]==='grav') return `background:conic-gradient(${cssv('--grav2')},${cssv('--ember')},${cssv('--grav2')})`;
+  if(v.segs.length>1){const a=segColor(v.segs[0]),b=segColor(v.segs[1]);return `background:conic-gradient(${a} 0 25%, ${b} 25% 50%, ${a} 50% 75%, ${b} 75% 100%)`;}
+  return `background:${segColor(v.segs[0])}`;
+}
+
+function drawNodes(){
+  const nodes=document.getElementById('nodes');
+  nodes.innerHTML=Object.entries(V).map(([id,v])=>{
+    const g=id==='gravitee';
+    const inner=g?`<img src="${GLOGO}" alt="Gravitee">`:logoImg(v);
+    const gwmark=v.gw?'<span class="gwmark">◆</span>':'';
+    return `<div class="node ${g?'grav':''}" data-id="${id}" style="left:${v.x}px;top:${v.y}px" tabindex="0" role="button" aria-label="${v.name} details"
+      onkeydown="if(event.key==='Enter')openVendor('${id}')">
+      <span class="ndisc" style="${ringStyle(v)}"><span class="inner">${inner}</span></span>
+      <span class="nlab">${v.name}${gwmark}</span>${v.sub?`<span class="nsub">${v.sub}</span>`:''}
+    </div>`;
+  }).join('');
+}
+
+/* ================= PAN / ZOOM (click-safe) ================= */
+const vp=document.getElementById('vp'), world=document.getElementById('world');
+let tx=0,ty=0,sc=0.5, dragging=false, moved=0, lx=0, ly=0;
+
+function apply(){world.style.transform=`translate(${tx}px,${ty}px) scale(${sc})`;}
+function clampScale(s){return Math.min(2.2,Math.max(0.22,s));}
+function fitHome(){
+  const r=vp.getBoundingClientRect();
+  if(r.width===0) return;
+  sc=clampScale(Math.min(r.width/WORLD_W,r.height/WORLD_H)*1.02);
+  tx=(r.width-WORLD_W*sc)/2; ty=(r.height-WORLD_H*sc)/2;
+  apply();
+}
+function flyHome(){world.classList.add('anim');fitHome();endAnim();}
+function flyTo(x,y,target){
+  const r=vp.getBoundingClientRect();
+  world.classList.add('anim');
+  sc=clampScale(target);
+  tx=r.width/2-x*sc; ty=r.height/2-y*sc;
+  apply(); endAnim();
+}
+function endAnim(){setTimeout(()=>world.classList.remove('anim'),580);}
+function zoomBy(f){const r=vp.getBoundingClientRect();zoomAt(r.width/2,r.height/2,f,true);}
+function zoomAt(px,py,f,anim){
+  const ns=clampScale(sc*f);
+  const wx=(px-tx)/sc, wy=(py-ty)/sc;
+  sc=ns; tx=px-wx*sc; ty=py-wy*sc;
+  if(anim){world.classList.add('anim');apply();endAnim();}else apply();
+}
+
+vp.addEventListener('wheel',e=>{e.preventDefault();const r=vp.getBoundingClientRect();zoomAt(e.clientX-r.left,e.clientY-r.top,e.deltaY<0?1.12:1/1.12,false);},{passive:false});
+vp.addEventListener('pointerdown',e=>{dragging=true;moved=0;lx=e.clientX;ly=e.clientY;vp.classList.add('grabbing');});
+vp.addEventListener('pointermove',e=>{if(!dragging)return;const dx=e.clientX-lx,dy=e.clientY-ly;moved+=Math.abs(dx)+Math.abs(dy);tx+=dx;ty+=dy;lx=e.clientX;ly=e.clientY;apply();});
+vp.addEventListener('pointerup',e=>{
+  const wasDrag=moved>6;
+  dragging=false;vp.classList.remove('grabbing');
+  if(!wasDrag){
+    const n=e.target.closest('.node');
+    if(n) openVendor(n.dataset.id);
+  }
+});
+vp.addEventListener('pointercancel',()=>{dragging=false;vp.classList.remove('grabbing');});
+vp.addEventListener('pointerleave',()=>{dragging=false;vp.classList.remove('grabbing');});
+window.addEventListener('resize',fitHome);
+
+/* fly buttons */
+(function(){
+  const bar=document.getElementById('mapbar');
+  bar.insertAdjacentHTML('beforeend',`<button class="fly" style="--tc:var(--grav)" onclick="flyTo(${GX},${GY},0.95)"><i></i>AI Gateway zone</button>`);
+  for(const k in TERR){
+    const t=TERR[k];
+    bar.insertAdjacentHTML('beforeend',`<button class="fly" style="--tc:${segColor(k)}" onclick="flyTo(${t.cx},${t.cy},0.82)"><i></i>${t.name}</button>`);
+  }
+})();
+
+/* ================= POPUP ================= */
+function openVendor(id){
+  const v=V[id];
+  const g=id==='gravitee';
+  const tags=v.segs.map(s=>`<span class="dtag" style="color:${segColor(s)};border-color:${segColor(s)}55">${SEGMETA[s].label}</span>`).join('')
+    +(v.gw?`<span class="dtag" style="color:${cssv('--grav2')};border-color:${cssv('--grav')}66">◆ AI gateway provider</span>`:'');
+  const az=AZMETA[v.az.t];
+  document.getElementById('modal').innerHTML=`
+    <button class="dclose" onclick="closeModal()" aria-label="Close">✕</button>
+    <div class="dhead"><span class="dlogo ${g?'dark':''}">${g?`<img src="${GLOGO}" alt="">`:logoImg(v)}</span><h3>${v.name}</h3></div>
+    <div class="dtags">${tags}</div>
+    <div class="dquote">"${v.tag}"</div>
+    <div class="prow"><div class="pl">Positioning</div><div class="pv">${v.pos}</div></div>
+    <div class="prow"><div class="pl">How they compete</div><div class="pv">${v.compete}</div></div>
+    <div class="prow"><div class="pl">Main strength</div><div class="pv">${v.str1}</div></div>
+    <div class="prow"><div class="pl">Main weakness</div><div class="pv">${v.weak1}</div></div>
+    <div class="prow"><div class="pl">Authorization engine</div><div class="pv"><span class="azbadge" style="color:${cssv(az.color)};border-color:${cssv(az.color)}66">${az.label}</span><br>${v.az.n}</div></div>
+    <div class="prow gravrow"><div class="pl">${g?'Honest self-read':'Gravitee angle'}</div><div class="pv">${v.angle}</div></div>
+    <button class="dcta" onclick="addToCompare('${id}')">Add ${v.name} to comparison</button>`;
+  document.getElementById('modal').classList.add('on');
+  document.getElementById('scrim').classList.add('on');
+}
+function closeModal(){
+  document.getElementById('modal').classList.remove('on');
+  document.getElementById('scrim').classList.remove('on');
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+
+/* ================= VIEWS ================= */
+function showView(v){
+  document.getElementById('view-map').style.display = v==='map'?'':'none';
+  document.getElementById('view-cmp').style.display = v==='cmp'?'':'none';
+  document.getElementById('tab-map').classList.toggle('on',v==='map');
+  document.getElementById('tab-cmp').classList.toggle('on',v==='cmp');
+  if(v==='map') requestAnimationFrame(fitHome);
+  window.scrollTo({top:0});
+}
+
+/* ================= COMPARE ================= */
+let sel=['gravitee'];
+const GROUPS=[
+ ['grav',['gravitee']],
+ ['apim',['kong','tyk','wso2','ibm','mulesoft']],
+ ['ain',['litellm','portkey','truefoundry','solo','envoyai']],
+ ['mod',['openai','anthropic','mistral']],
+ ['hyp',['aws','google','microsoft']],
+ ['aigp',['airia','servicenow','credo','onetrust','truyo']],
+ ['ctx',['salesforce','databricks','snowflake','confluent']]
+];
+
+function pchip(id){
+  const v=V[id];
+  const logo=id==='gravitee'?`<img src="${GLOGO}" alt="">`:logoImg(v);
+  return `<button class="pchip ${sel.includes(id)?'sel':''}" onclick="toggleSel('${id}')"><span class="plogo">${logo}</span>${v.name}</button>`;
+}
+function renderPicker(){
+  document.getElementById('pickgrid').innerHTML=GROUPS.map(([g,ids])=>`
+    <div class="pgroup"><div class="gl" style="color:${segColor(g)}">${SEGMETA[g].label}</div>
+    <div class="pickrow">${ids.map(pchip).join('')}</div></div>`).join('');
+}
+function toggleSel(id){
+  if(sel.includes(id)) sel=sel.filter(x=>x!==id);
+  else{ if(sel.length>=4){alert('Four vendors max keeps the comparison readable. Remove one first.');return;} sel.push(id); }
+  renderPicker(); renderCompare();
+}
+function addToCompare(id){
+  if(!sel.includes(id)){ if(sel.length>=4) sel.shift(); sel.push(id); }
+  closeModal(); renderPicker(); renderCompare(); showView('cmp');
+}
+
+const DIMS=[['agent','Agent & MCP depth'],['neutral','Model & ecosystem neutrality'],['deploy','Deployment flexibility & sovereignty support'],['gov','Governance & policy depth'],['ent','Enterprise readiness'],['dev','Developer adoption']];
+function scoreCell(n){return `<div class="score"><span class="sbar"><i style="width:${n*20}%"></i></span><span class="snum">${n}/5</span></div>`;}
+
+function renderCompare(){
+  const out=document.getElementById('cmp-out');
+  if(sel.length<2){out.innerHTML='<div class="cmp-empty">Select at least two vendors above to compare them side by side.</div>';return;}
+  const vs=sel.map(id=>V[id]);
+  let html='<div class="cmp-scroll"><table class="cmp"><thead><tr><th></th>';
+  sel.forEach(id=>{const v=V[id];const logo=id==='gravitee'?`<img src="${GLOGO}" alt="">`:logoImg(v);
+    html+=`<th><div class="cmp-vh"><span class="plogo">${logo}</span><div><div class="nm">${v.name}</div><div class="sg">${v.segs.map(s=>SEGMETA[s].label).join(' · ')}${v.gw?' · ◆ gateway':''}</div></div></div></th>`;});
+  html+='</tr></thead><tbody>';
+  const trow=(label,fn)=>{html+=`<tr><td>${label}</td>${vs.map(v=>`<td>${fn(v)}</td>`).join('')}</tr>`;};
+  trow('Origin',v=>`<div class="txt">${v.origin}</div>`);
+  trow('Primary buyer',v=>`<div class="txt">${v.buyer}</div>`);
+  trow('GTM motion',v=>`<div class="txt">${v.compete}</div>`);
+  trow('Authorization engine',v=>{const az=AZMETA[v.az.t];return `<div class="txt"><span class="azbadge" style="color:${cssv(az.color)};border-color:${cssv(az.color)}66">${az.label}</span><br>${v.az.n}</div>`;});
+  DIMS.forEach(([k,label])=>trow(label,v=>scoreCell(v.s[k])));
+  trow('Pricing model',v=>`<div class="txt">${v.pricing}</div>`);
+  trow('Honest bottom line',v=>`<div class="honest">${v.bottom}</div>`);
+  html+='</tbody></table></div>';
+  html+=verdict(vs);
+  out.innerHTML=html;
+}
+
+function verdict(vs){
+  const names=vs.map(v=>v.name);
+  const hasG=vs.some(v=>v===V.gravitee);
+  const tot=v=>Object.values(v.s).reduce((a,b)=>a+b,0);
+  const sorted=[...vs].sort((a,b)=>tot(b)-tot(a));
+  const dimLead=k=>{const best=Math.max(...vs.map(v=>v.s[k]));return vs.filter(v=>v.s[k]===best).map(v=>v.name);};
+  const agent=dimLead('agent'),gov=dimLead('gov'),ent=dimLead('ent'),neutral=dimLead('neutral'),dep=dimLead('deploy');
+  let p=`Across ${names.join(', ')}: ${agent.join(' and ')} lead${agent.length>1?'':'s'} on agent and MCP depth, ${gov.join(' and ')} on governance, and ${ent.join(' and ')} on enterprise readiness. ${neutral.join(' and ')} take${neutral.length>1?'':'s'} neutrality, with ${dep.join(' and ')} strongest on deployment flexibility and sovereignty support. `;
+  p+=`On aggregate profile, ${sorted[0].name} covers the most ground, but no single vendor here wins every dimension, and the right choice depends on whether the buyer weighs runtime enforcement, ecosystem neutrality, or incumbent safety most heavily. `;
+  if(hasG){p+=`Gravitee\u2019s honest position in this set: it wins where neutrality, unified API-event-agent governance, and sovereign deployment decide the deal, and it has to work harder where brand incumbency or single-cloud convenience frames the evaluation.`;}
+  else{p+=`None of the selected vendors offers a neutral control plane spanning API, event, and agent traffic with sovereign deployment options, which is the gap Gravitee\u2019s positioning targets.`;}
+  return `<div class="verdict"><h3>Reading the matchup</h3><p>${p}</p></div>`;
+}
+
+/* ================= INIT ================= */
+drawTerritories();
+drawNodes();
+fitHome();
+renderPicker();
+renderCompare();
+</script>
+</body>
+</html>
