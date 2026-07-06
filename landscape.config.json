@@ -1,0 +1,17 @@
+{
+  "_comment": "Slack sources for /update-landscape. Replace channel names with your real ones. vendorHints route ambiguous mentions to the right vendor id (keys must match ids in the V object of index.html).",
+  "channels": ["#competitive-intel", "#field-updates", "#deal-desk"],
+  "lookbackDays": 14,
+  "vendorHints": {
+    "kong": ["konnect", "kong ai gateway", "kong konghq"],
+    "salesforce": ["mulesoft", "agentforce"],
+    "microsoft": ["azure api management", "azure apim", "copilot"],
+    "google": ["apigee", "vertex", "ai studio"],
+    "aws": ["bedrock", "api gateway", "amazon"],
+    "solo": ["gloo", "solo.io"],
+    "ibm": ["api connect", "watsonx"],
+    "wso2": ["asgardeo", "choreo", "identity server"],
+    "confluent": ["kafka", "flink"],
+    "servicenow": ["now assist", "now platform"]
+  }
+}

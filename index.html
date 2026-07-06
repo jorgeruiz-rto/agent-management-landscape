@@ -9,7 +9,7 @@
     --bg:#0A0705; --panel:#151009; --panel2:#1D1610; --line:#2C231A;
     --ink:#EDE7E0; --ink2:#C9C0B6; --mut:#8C8177;
     --grav:#FF5A2D; --grav2:#FF8A3D; --ember:#B33A12;
-    --apim:#E8A33D; --ain:#5FD3A5; --mod:#B48CF2; --hyp:#5EA8F5; --aigp:#F26D6D; --ctx:#4FC8D8;
+    --apim:#E8A33D; --ain:#5FD3A5; --mod:#B48CF2; --hyp:#5EA8F5; --aigp:#F26D6D; --ctx:#4FC8D8; --agf:#D4E157; --sec:#E561C3;
     --r:14px;
   }
   *{box-sizing:border-box;margin:0;padding:0}
@@ -47,7 +47,7 @@
     var(--bg);
     touch-action:none;user-select:none}
   .viewport.grabbing{cursor:grabbing}
-  .world{position:absolute;top:0;left:0;width:2600px;height:1600px;transform-origin:0 0;will-change:transform}
+  .world{position:absolute;top:0;left:0;width:2600px;height:1780px;transform-origin:0 0;will-change:transform}
   .world.anim{transition:transform .55s cubic-bezier(.3,.1,.2,1)}
   svg.terr{position:absolute;inset:0;width:100%;height:100%}
 
@@ -72,6 +72,15 @@
   .node.grav .inner{background:radial-gradient(circle at 40% 30%,#241109,#120A05)}
   .node.grav .inner img{width:62%;height:62%}
   .node.grav .nlab{font-size:20px}
+  .node{transition:opacity .22s,filter .22s}
+  .node.dim{opacity:.13;filter:grayscale(1)}
+
+  /* map search / filter controls */
+  .mapsearch{background:var(--panel2);border:1px solid var(--line);color:var(--ink);font-size:12px;font-weight:600;padding:7px 13px;border-radius:99px;min-width:160px}
+  .mapsearch::placeholder{color:var(--mut)}
+  .mapsearch:focus{outline:none;border-color:var(--grav)}
+  .mapsel{background:var(--panel2);border:1px solid var(--line);color:var(--ink2);font-size:12px;font-weight:650;padding:7px 11px;border-radius:99px;cursor:pointer}
+  .mapsel:focus{outline:none;border-color:var(--grav)}
 
   .mapfoot{display:flex;gap:18px;flex-wrap:wrap;margin-top:12px;font-size:12px;color:var(--ink2);align-items:center}
   .mapfoot span{display:inline-flex;align-items:center;gap:7px}
@@ -105,8 +114,61 @@
   .prow.gravrow{background:linear-gradient(135deg,rgba(255,90,45,.10),rgba(255,90,45,.03));border:1px solid rgba(255,90,45,.35);border-top:1px solid rgba(255,90,45,.35);border-radius:12px;padding:12px 14px;margin-top:10px}
   .prow.gravrow .pl{color:var(--grav2)}
   .prow.gravrow .pv{color:var(--ink)}
+  /* Field playbook (call-ready block) */
+  .playbook{margin-top:14px;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .playbook .phd{font-size:10px;letter-spacing:.16em;text-transform:uppercase;font-weight:800;color:var(--grav2);background:linear-gradient(135deg,rgba(255,90,45,.12),rgba(255,90,45,.03));padding:9px 14px;border-bottom:1px solid var(--line)}
+  .pbrow{display:grid;grid-template-columns:110px 1fr;gap:12px;padding:10px 14px;border-top:1px solid var(--line);align-items:start}
+  .pbrow:first-of-type{border-top:none}
+  .pbrow .pl{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--mut);font-weight:750;padding-top:2px}
+  .pbrow .pv{font-size:13px;line-height:1.55;color:var(--ink2)}
+  .pbrow .pv.win{color:var(--ain)}
+  .pbrow .pv.lose{color:var(--aigp)}
+  .pbrow ul{margin:0;padding-left:16px}
+  .pbrow ul li{margin:2px 0}
+  .pbrow .obj{margin:0 0 7px}
+  .pbrow .obj:last-child{margin-bottom:0}
+  .pbrow .obj .atk{color:var(--ink);font-weight:650}
+  .pbrow .obj .atk::before{content:"“"}
+  .pbrow .obj .atk::after{content:"”"}
+  .pbrow .obj .reply{color:var(--ain)}
+  .pbrow .obj .reply::before{content:"→ "}
   .dcta{width:100%;margin-top:14px;background:var(--grav);border:none;color:#fff;font-weight:750;font-size:14px;padding:12px;border-radius:10px;cursor:pointer}
   .dcta:hover{background:var(--grav2)}
+  /* SHARE EXTERNALLY */
+  .share-btn{background:transparent;border:1px solid var(--grav);color:var(--grav2);font-weight:700;font-size:12.5px;padding:8px 14px;border-radius:99px;cursor:pointer;display:inline-flex;align-items:center;gap:7px;transition:background .14s,color .14s}
+  .share-btn:hover{background:rgba(255,90,45,.13);color:var(--ink)}
+  .share-btn:disabled,.share-btn.disabled{opacity:.45;cursor:not-allowed;pointer-events:none}
+  .share-btn::before{content:'↗';font-size:13px;font-weight:800}
+  .modal .share-btn{width:100%;justify-content:center;margin-top:10px;padding:11px}
+  .cmp-topbar{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+  .cmp-topbar .ct-t{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);font-weight:750}
+  .cmp-topbar .share-btn{margin-left:auto}
+  #shareScrim{z-index:60}
+  #shareModal{z-index:70;width:min(460px,94vw)}
+  #shareModal h3{font-size:18px;font-weight:800;letter-spacing:-.015em;color:var(--ink);margin-bottom:6px;text-transform:none;letter-spacing:0}
+  #shareModal .sh-sub{font-size:12.5px;color:var(--ink2);line-height:1.6;margin-bottom:14px}
+  .share-strip{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:16px}
+  .share-strip .ss-h{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--aigp);font-weight:800;margin-bottom:8px}
+  .share-strip .ss-h.inc{color:var(--ain)}
+  .share-strip ul{margin:0;padding-left:18px}
+  .share-strip li{font-size:12px;color:var(--ink2);line-height:1.7}
+  .share-gate{background:rgba(179,58,18,.08);border:1px solid rgba(179,58,18,.25);border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:12.5px;color:var(--ink2);line-height:1.6}
+  .share-lbl{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--mut);font-weight:750;display:block;margin-bottom:6px}
+  .share-field{width:100%;background:var(--panel2);border:1px solid var(--line);color:var(--ink);font-size:14px;padding:11px 13px;border-radius:10px}
+  .share-field:focus{outline:none;border-color:var(--grav)}
+  .share-field.err{border-color:var(--aigp)}
+  .share-err{color:var(--aigp);font-size:12px;margin-top:7px;min-height:15px}
+  .share-preview{display:inline-flex;align-items:center;gap:6px;margin-top:14px;color:var(--grav2);font-size:13px;font-weight:700;text-decoration:none;border-bottom:1px solid rgba(255,90,45,.4)}
+  .share-preview:hover{color:var(--ink);border-bottom-color:var(--grav)}
+  .share-previewnote{font-size:11.5px;color:var(--mut);margin-top:5px;line-height:1.5}
+  .share-send{width:100%;margin-top:14px;background:var(--grav);border:none;color:#fff;font-weight:750;font-size:14px;padding:12px;border-radius:10px;cursor:pointer}
+  .share-send:hover{background:var(--grav2)}
+  .share-ok{text-align:center;padding:8px 0}
+  .share-ok .ok-mark{width:52px;height:52px;border-radius:50%;background:rgba(95,211,165,.15);color:var(--ain);display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 14px}
+  .share-ok .ok-t{font-size:16px;font-weight:800;color:var(--ink);margin-bottom:8px}
+  .share-ok .ok-sub{font-size:12.5px;color:var(--ink2);line-height:1.6;margin-bottom:6px}
+  .share-ok .ok-sub b{color:var(--ink)}
+  .share-ok .ok-proto{font-size:11px;color:var(--mut);font-style:italic;margin-top:10px}
 
   /* ===== COMPARE ===== */
   .cmp-pick{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:20px 22px;margin-bottom:26px}
@@ -144,6 +206,44 @@
   .verdict h3{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--grav2);margin-bottom:10px}
   .verdict p{font-size:13.5px;line-height:1.7;color:var(--ink2)}
 
+  .method{margin-bottom:26px;background:var(--panel);border:1px solid var(--line);border-radius:var(--r)}
+  .method summary{cursor:pointer;padding:15px 22px;font-size:13px;font-weight:750;color:var(--ink2);list-style:none}
+  .method summary::-webkit-details-marker{display:none}
+  .method summary::before{content:'▸';color:var(--grav2);margin-right:9px;font-size:11px}
+  .method[open] summary::before{content:'▾'}
+  .method summary:hover{color:var(--ink)}
+  .method .mbody{padding:0 22px 18px}
+  .method .mrow{display:grid;grid-template-columns:210px 1fr;gap:14px;padding:9px 0;border-top:1px solid var(--line);font-size:12.5px;line-height:1.55;color:var(--ink2)}
+  .method .mk{color:var(--ink);font-weight:700}
+  .method .mnote{font-size:11.5px;color:var(--mut);margin-top:12px;line-height:1.6}
+
+  /* Feature comparison (gravitee.io style) */
+  .fc-wrap{margin-top:34px}
+  .fc-hero{margin-bottom:8px}
+  .fc-hero p{font-size:14px;line-height:1.65;color:var(--ink2);max-width:820px}
+  .fc-hl{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .fc-hl span{font-size:11.5px;font-weight:600;padding:6px 12px;border-radius:99px;background:rgba(95,211,165,.12);color:var(--ain);border:1px solid rgba(95,211,165,.28)}
+  .fc-section{margin-top:30px;padding-top:26px;border-top:1px solid var(--line)}
+  .fc-section h3{font-size:17px;font-weight:800;color:var(--ink);letter-spacing:-.02em;margin-bottom:4px}
+  .fc-sub{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--grav2);font-weight:750;margin-bottom:8px}
+  .fc-narr{font-size:13px;line-height:1.65;color:var(--ink2);margin-bottom:18px;max-width:900px}
+  .fc-table{width:100%;border-collapse:separate;border-spacing:0}
+  .fc-table th,.fc-table td{padding:14px 16px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line);font-size:13px}
+  .fc-table th{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--mut);font-weight:750;border-bottom:2px solid var(--line)}
+  .fc-table th:nth-child(2){color:var(--grav2)}
+  .fc-feat-name{font-weight:750;color:var(--ink);font-size:13.5px}
+  .fc-feat-desc{font-size:12px;color:var(--mut);margin-top:5px;line-height:1.5;max-width:340px}
+  .fc-yes{color:var(--ain);font-weight:800;font-size:17px;line-height:1}
+  .fc-no{color:var(--aigp);font-weight:800;font-size:17px;line-height:1}
+  .fc-part{color:#c9a227;font-weight:800;font-size:17px;line-height:1}
+  .fc-note{font-size:12.5px;line-height:1.55;color:var(--ink2);margin-top:8px}
+  .fc-conclusion{margin-top:32px;padding:22px 24px;background:linear-gradient(135deg,rgba(255,90,45,.09),rgba(255,90,45,.02));border:1px solid rgba(255,90,45,.28);border-radius:var(--r)}
+  .fc-conclusion h3{font-size:15px;font-weight:800;color:var(--ink);margin-bottom:10px}
+  .fc-conclusion p{font-size:13.5px;line-height:1.7;color:var(--ink2)}
+  .fc-linkbanner{margin-top:20px;padding:14px 18px;background:var(--panel2);border:1px solid var(--line);border-radius:var(--r);font-size:13px;color:var(--ink2)}
+  .fc-linkbanner a{color:var(--grav2);font-weight:700}
+  .fc-heading{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--grav2);font-weight:800;margin:34px 0 6px}
+
   footer{margin-top:46px;font-size:11px;color:var(--mut);line-height:1.7;border-top:1px solid var(--line);padding-top:18px}
 
   @media (max-width:760px){
@@ -174,11 +274,13 @@
   <section id="view-map">
     <div class="mapbar" id="mapbar">
       <button class="fly" style="--tc:var(--grav)" onclick="flyHome()"><i></i>Overview</button>
+      <input class="mapsearch" id="mapsearch" type="search" placeholder="Search vendors…" aria-label="Search vendors" autocomplete="off">
+      <select class="mapsel" id="mapseg" aria-label="Filter by segment"><option value="">All segments</option></select>
     </div>
 
     <div class="viewport" id="vp">
       <div class="world" id="world">
-        <svg class="terr" viewBox="0 0 2600 1600" xmlns="http://www.w3.org/2000/svg" id="terrsvg"></svg>
+        <svg class="terr" viewBox="0 0 2600 1780" xmlns="http://www.w3.org/2000/svg" id="terrsvg"></svg>
         <div id="labels"></div>
         <div id="nodes"></div>
       </div>
@@ -194,14 +296,15 @@
       <span><i class="dot" style="background:var(--mod)"></i>Model vendors</span>
       <span><i class="dot" style="background:var(--hyp)"></i>Hyperscalers</span>
       <span><i class="dot" style="background:var(--aigp)"></i>AI governance</span>
+      <span><i class="dot" style="background:var(--agf)"></i>Agent frameworks</span>
+      <span><i class="dot" style="background:var(--sec)"></i>AI &amp; API security</span>
       <span><i class="dot" style="background:var(--ctx)"></i>Data &amp; context economy</span>
-      <span style="color:var(--grav2)">◆ ships an AI gateway (Gartner, May 2026)</span>
+      <span style="color:var(--grav2)">◆ ships an AI gateway</span>
       <span class="hint">Drag to pan · scroll to zoom · click a vendor for its profile. The orange zone marks AI gateway providers and overlaps every front it touches.</span>
     </div>
 
     <div class="overlapnote">
-      <b>How to read the territory.</b> The orange center is the AI gateway zone: every vendor inside it ships an AI gateway, per Gartner's May 2026 vendor list, and the zone deliberately overlaps the API incumbents, the AI-natives, the hyperscalers, and the governance platforms, because that is where the $250M-to-$1B gateway market is being contested. Gravitee sits at its center as the only neutral, enterprise-grade plane spanning API, event, model, MCP, and agent traffic. <b>IBM</b> occupies a triple point: API incumbent, AIGP Leader, and gateway provider. <b>Airia</b> is the governance vendor that crossed into the zone with an MCP gateway. <b>Google and Microsoft</b> fight from the hyperscaler front with frontier models of their own, and the <b>model vendors</b> sit just outside the zone, building agent stacks that govern only themselves. The <b>data and context economy</b> on the western flank (Salesforce, Databricks, Snowflake, Confluent) owns the context agents consume, not the traffic between context, models, and agents. That traffic is the seam Gravitee claims.
-    </div>
+      <b>How to read the territory.</b> The orange center is the AI gateway zone: every vendor inside it ships an AI gateway, and the zone deliberately overlaps the API incumbents, the AI-natives, the hyperscalers, and the governance platforms, because that is where Gartner's $250M-to-$1B gateway market is being contested. Gravitee sits at its center as the only neutral, enterprise-grade plane spanning API, event, model, MCP, and agent traffic. <b>IBM</b> occupies a triple point (API incumbent, AIGP Leader, gateway provider) and <b>Airia</b> is the governance vendor that crossed into the zone with an MCP gateway. <b>Salesforce + MuleSoft</b> is drawn as one force straddling the context economy and API management. The <b>agent frameworks</b> band on the eastern flank (LangChain, CrewAI, LlamaIndex) overlaps the open source world and reaches toward the hyperscalers, whose own frameworks (AutoGen and Semantic Kernel, Strands, ADK) make Microsoft, AWS, and Google framework players too: frameworks build the agents, and every agent they spawn is traffic someone must govern. The <b>AI and API security</b> front at the south (Cloudflare, Lasso, Cequence, Palo Alto) enters from risk mitigation, as Gartner's gateway report describes, watching traffic rather than running it. The <b>data and context economy</b> on the western flank owns the context agents consume. Between all of them runs the traffic, and that seam is Gravitee's territory.</div>
   </section>
 
   <!-- ================= COMPARE ================= -->
@@ -211,6 +314,7 @@
       <div class="sub">Select two to four vendors. Scores are directional 1 to 5 assessments for enablement discussion, grounded in the May and June 2026 Gartner research plus field intelligence. The read is deliberately honest, including on Gravitee.</div>
       <div id="pickgrid"></div>
     </div>
+    <details class="method" id="method"></details>
     <div id="cmp-out"><div class="cmp-empty">Select at least two vendors above to compare them side by side.</div></div>
   </section>
 
@@ -222,6 +326,10 @@
 <div class="scrim" id="scrim" onclick="closeModal()"></div>
 <div class="modal" id="modal" role="dialog" aria-modal="true"></div>
 
+<div class="scrim" id="shareScrim" onclick="closeShare()"></div>
+<div class="modal" id="shareModal" role="dialog" aria-modal="true"></div>
+
+<script src="feature-compare.js"></script>
 <script>
 const GLOGO="data:image/png;base64,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";
 
@@ -233,6 +341,8 @@ const SEGMETA = {
   hyp:{label:'Hyperscaler',v:'--hyp'},
   aigp:{label:'AI governance platform',v:'--aigp'},
   ctx:{label:'Data & context economy',v:'--ctx'},
+  agf:{label:'Agent framework',v:'--agf'},
+  sec:{label:'AI & API security',v:'--sec'},
   grav:{label:'Neutral control plane',v:'--grav'}
 };
 const AZMETA={
@@ -241,18 +351,30 @@ const AZMETA={
   platform:{label:'In-platform only',color:'--mod'},
   byo:{label:'Bring your own',color:'--aigp'}
 };
+const DIMS=[['agent','Agent & MCP depth'],['neutral','Model & ecosystem neutrality'],['deploy','Deployment flexibility & sovereignty support'],['gov','Governance & policy depth'],['ent','Enterprise readiness'],['dev','Developer adoption']];
+const MEANINGS={
+  agent:'How deeply the product governs agent and MCP traffic at runtime, versus merely helping build agents.',
+  neutral:'Freedom from a competing model, cloud, or SaaS agenda that would bias where traffic flows.',
+  deploy:'Range of deployment options — SaaS, self-hosted, hybrid, air-gapped — for sovereign and regulated use.',
+  gov:'Depth of policy, access, and governance controls enforced at the traffic layer, not just recorded.',
+  ent:'Viability, support, compliance, and scale for mission-critical production use.',
+  dev:'Developer mindshare and bottom-up adoption velocity.'
+};
+function scoreCell(n){return `<div class="score"><span class="sbar"><i style="width:${n*20}%"></i></span><span class="snum">${n}/5</span></div>`;}
 const cssv = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
 const segColor = s => cssv(SEGMETA[s].v);
 
 const TERR = {
   apim:{name:'API management incumbents',quip:'"Bolt-on, not built-in."',cx:720,cy:470,rx:420,ry:280},
   aigp:{name:'AI governance platforms',quip:'"Governance of record, not at runtime."',cx:1330,cy:240,rx:450,ry:210},
-  ain:{name:'AI-native & open source',quip:'"Built for the demo, not the board."',cx:1900,cy:450,rx:400,ry:280},
+  ain:{name:'AI-native & open source',quip:'"Built for the demo, not the board."',cx:1930,cy:450,rx:500,ry:310},
+  agf:{name:'Agent frameworks',quip:'"Where agents get built, not governed."',cx:2200,cy:900,rx:280,ry:320},
+  sec:{name:'AI & API security',quip:'"Watching the traffic, not running it."',cx:1330,cy:1560,rx:450,ry:170},
   mod:{name:'Model vendors',quip:'"One model\u2019s walled garden."',cx:980,cy:1250,rx:400,ry:250},
   hyp:{name:'Hyperscalers',quip:'"Lock-in dressed as convenience."',cx:1680,cy:1210,rx:400,ry:250},
-  ctx:{name:'Data & context economy',quip:'"They own the context, not the traffic."',cx:300,cy:880,rx:250,ry:540}
+  ctx:{name:'Data & context economy',quip:'"They own the context, not the traffic."',cx:300,cy:880,rx:300,ry:540}
 };
-const GWZONE={cx:1330,cy:810,rx:720,ry:510};
+const GWZONE={cx:1330,cy:810,rx:850,ry:620};
 
 const V = {
 gravitee:{name:'Gravitee',m:'G',c:'#FF5A2D',segs:['grav'],x:1330,y:810,dom:'gravitee.io',slug:null,gw:true,sub:'Neutral control & security plane',
@@ -268,7 +390,7 @@ gravitee:{name:'Gravitee',m:'G',c:'#FF5A2D',segs:['grav'],x:1330,y:810,dom:'grav
  bottom:'Strongest neutrality and deployment story in the field, with real gateway maturity behind it. Needs to keep converting that into agent-specific proof before AI-native rivals grow up or incumbents catch up.',
  s:{agent:4,neutral:5,deploy:5,gov:4,ent:4,dev:3}},
 
-kong:{name:'Kong',m:'K',c:'#169FCC',segs:['apim'],x:880,y:470,dom:'konghq.com',slug:'kong',gw:true,
+kong:{name:'Kong',m:'K',c:'#169FCC',segs:['apim'],x:900,y:430,dom:'konghq.com',slug:'kong',gw:true,
  tag:'Developer-darling gateway, now selling a SaaS platform.',
  pos:'API platform extending into AI gateway through Konnect and plugins. Strongest developer brand among incumbents.',
  compete:'Bottom-up open source adoption converted into Konnect subscriptions. Developer-led, cloud-first, loud marketing.',
@@ -281,7 +403,7 @@ kong:{name:'Kong',m:'K',c:'#169FCC',segs:['apim'],x:880,y:470,dom:'konghq.com',s
  bottom:'The most dangerous incumbent competitor on developer sentiment and speed of announcement. Beatable on sovereignty, event-native workloads, and total cost as usage scales.',
  s:{agent:4,neutral:4,deploy:3,gov:3,ent:4,dev:5}},
 
-tyk:{name:'Tyk',m:'T',c:'#B8332E',segs:['apim'],x:740,y:590,dom:'tyk.io',slug:null,gw:true,
+tyk:{name:'Tyk',m:'T',c:'#B8332E',segs:['apim'],x:760,y:580,dom:'tyk.io',slug:null,gw:true,
  tag:'The self-hosted pragmatist.',
  pos:'Self-hosted API management for buyers who prioritize ownership and cost control, with Tyk AI Studio layered on.',
  compete:'Open source funnel into self-managed enterprise licenses. EMEA-strong, pragmatic pricing.',
@@ -294,7 +416,7 @@ tyk:{name:'Tyk',m:'T',c:'#B8332E',segs:['apim'],x:740,y:590,dom:'tyk.io',slug:nu
  bottom:'A fair, likable competitor for classic API management deals, rarely the finalist for a strategic agent platform decision.',
  s:{agent:2,neutral:4,deploy:5,gov:2,ent:3,dev:3}},
 
-wso2:{name:'WSO2',m:'W',c:'#E67E22',segs:['apim'],x:880,y:690,dom:'wso2.com',slug:'wso2',gw:true,
+wso2:{name:'WSO2',m:'W',c:'#E67E22',segs:['apim'],x:930,y:610,dom:'wso2.com',slug:'wso2',gw:true,
  tag:'The full middleware suite, now under new ownership.',
  pos:'Full middleware suite: APIs, integration, and identity from one vendor, with AI arriving as a suite refresh.',
  compete:'Suite deals into APAC and public sector on open source credibility; EQT ownership pushing consolidation.',
@@ -320,20 +442,33 @@ ibm:{name:'IBM',m:'IBM',c:'#2469C8',segs:['apim','aigp'],x:1080,y:370,dom:'ibm.c
  bottom:'The safest throat to choke for a Fortune 100 risk officer, and the slowest path to a working agent platform. Both statements are true.',
  s:{agent:3,neutral:3,deploy:4,gov:5,ent:5,dev:2}},
 
-mulesoft:{name:'MuleSoft',m:'M',c:'#00A0DF',segs:['apim'],x:1010,y:580,dom:'mulesoft.com',slug:'mulesoft',gw:true,
- tag:'Salesforce integration arm, pulled into the Agentforce orbit.',
- pos:'Anypoint and Flex Gateway for APIs, increasingly positioned as the integration layer feeding Salesforce Agentforce.',
- compete:'Sold through the Salesforce field into the CRM installed base; Agentforce-first story with MuleSoft as plumbing.',
- str1:'Salesforce reach and a large enterprise integration footprint.',
- weak1:'Cost and renewal friction; neutrality is the opposite of the strategy.',
- az:{t:'platform',n:'Leans on Salesforce identity and external IdPs; no standalone authorization engine of its own.'},
- angle:'Displacement: cost, openness, and agents that span more than one ecosystem.',
- origin:'Integration platform, acquired by Salesforce 2018',buyer:'Salesforce-aligned IT and integration teams',
- pricing:'Premium subscription, frequent renewal escalation',
- bottom:'Formidable where Salesforce owns the account, structurally uninterested in neutrality everywhere else. High-quality displacement target.',
- s:{agent:2,neutral:3,deploy:3,gov:3,ent:4,dev:3}},
+api7:{name:'API7.ai',m:'A7',c:'#10B981',segs:['apim'],x:700,y:430,dom:'api7.ai',slug:null,gw:true,
+ tag:'The commercial steward of Apache APISIX.',
+ pos:'Commercial company behind Apache APISIX, selling APISIX-based API and AI gateway capabilities.',
+ compete:'Open source APISIX funnel into commercial and cloud offerings, strongest in China and APAC.',
+ str1:'APISIX performance and community at low cost.',
+ weak1:'Limited enterprise presence and field coverage in NA and EMEA.',
+ az:{t:'partner',n:'Gateway-level enforcement; identity delegated to external IdPs.'},
+ angle:'Rarely met in Western enterprise deals; win on platform breadth and enterprise support.',
+ origin:'APISIX creators, APAC-centered',buyer:'Cost-conscious platform teams, APAC',
+ pricing:'Open source plus commercial tiers',
+ bottom:'Strong engine, thin enterprise wrapper outside APAC.',
+ s:{agent:2,neutral:4,deploy:4,gov:2,ent:2,dev:4}},
 
-litellm:{name:'LiteLLM',m:'L',c:'#3B82F6',segs:['ain'],x:1710,y:400,dom:'litellm.ai',slug:null,gw:true,
+boomi:{name:'Boomi',m:'B',c:'#2A5CF5',segs:['apim'],x:480,y:420,dom:'boomi.com',slug:'boomi',gw:false,
+ tag:'The iPaaS borrowing agent management language.',
+ pos:'iPaaS with federated API management, pushing into agents with Agent Control Tower and Agentstudio.',
+ compete:'Integration installed base plus a mid-market motion; agents positioned as the next integration workload.',
+ str1:'Large mid-market integration footprint and fast agent-management messaging.',
+ weak1:'Gateway and runtime depth trail dedicated platforms.',
+ az:{t:'partner',n:'Platform roles plus external IdPs; no standalone authorization engine.'},
+ angle:'Boomi validates the agent control category; win on gateway depth and governance.',
+ origin:'iPaaS vendor, Pennsylvania',buyer:'Integration and IT teams, mid-market to enterprise',
+ pricing:'Subscription',
+ bottom:'An integration player borrowing agent language. Watch the narrative, not the runtime.',
+ s:{agent:2,neutral:3,deploy:3,gov:2,ent:3,dev:3}},
+
+litellm:{name:'LiteLLM',m:'L',c:'#3B82F6',segs:['ain'],x:1720,y:390,dom:'litellm.ai',slug:null,gw:true,
  tag:'The default open source LLM proxy.',
  pos:'Open source LLM proxy: one API across 100+ model providers, with keys, budgets, and logging.',
  compete:'GitHub to production, then a paid enterprise tier. Often already inside the account before any evaluation starts.',
@@ -346,7 +481,7 @@ litellm:{name:'LiteLLM',m:'L',c:'#3B82F6',segs:['ain'],x:1710,y:400,dom:'litellm
  bottom:'Wins the first ninety days of almost every internal AI platform journey. Rarely survives the first serious security review as the long-term answer.',
  s:{agent:3,neutral:5,deploy:4,gov:2,ent:2,dev:5}},
 
-portkey:{name:'Portkey',m:'P',c:'#7C5CFC',segs:['ain'],x:1840,y:495,dom:'portkey.ai',slug:null,gw:true,
+portkey:{name:'Portkey',m:'P',c:'#7C5CFC',segs:['ain'],x:1830,y:460,dom:'portkey.ai',slug:null,gw:true,
  tag:'The polished AI-native gateway.',
  pos:'The most complete pure-play AI gateway: routing, guardrails, prompt management, observability.',
  compete:'Product-led SaaS aimed at AI engineers, moving upmarket into platform team deals.',
@@ -359,7 +494,7 @@ portkey:{name:'Portkey',m:'P',c:'#7C5CFC',segs:['ain'],x:1840,y:495,dom:'portkey
  bottom:'The best pure-play product in the segment. The question buyers keep asking is not about features, it is about betting a control plane on a young startup.',
  s:{agent:4,neutral:5,deploy:3,gov:3,ent:2,dev:4}},
 
-solo:{name:'Solo.io',m:'S',c:'#A855F7',segs:['ain'],x:1710,y:545,dom:'solo.io',slug:null,gw:true,
+solo:{name:'Solo.io',m:'S',c:'#A855F7',segs:['ain'],x:1620,y:520,dom:'solo.io',slug:null,gw:true,
  tag:'The Envoy specialists moving fastest on agent infrastructure.',
  pos:'Gloo platform on Envoy, with agentgateway and serious early investment in MCP and A2A traffic.',
  compete:'Sells to cloud-native platform teams on Envoy and CNCF credibility; open source feeds commercial adoption.',
@@ -372,7 +507,7 @@ solo:{name:'Solo.io',m:'S',c:'#A855F7',segs:['ain'],x:1710,y:545,dom:'solo.io',s
  bottom:'If the buyer is a Kubernetes-fluent platform team, Solo is a real threat. The moment governance and non-infra stakeholders enter the room, the field tilts back.',
  s:{agent:4,neutral:4,deploy:4,gov:3,ent:3,dev:4}},
 
-envoyai:{name:'Envoy AI Gateway',m:'E',c:'#E85D9E',segs:['ain'],x:1860,y:610,dom:'envoyproxy.io',slug:'envoyproxy',gw:true,
+envoyai:{name:'Envoy AI Gateway',m:'E',c:'#E85D9E',segs:['ain'],x:1800,y:590,dom:'envoyproxy.io',slug:'envoyproxy',gw:true,
  tag:'The neutral substrate everyone else builds on.',
  pos:'Open source CNCF-aligned AI gateway project on Envoy Proxy; the substrate under many commercial products.',
  compete:'Community-driven; commercial support arrives through vendors like Tetrate and Solo, not the project.',
@@ -385,7 +520,7 @@ envoyai:{name:'Envoy AI Gateway',m:'E',c:'#E85D9E',segs:['ain'],x:1860,y:610,dom
  bottom:'Excellent raw material, not a solution. The competitor here is the internal build decision, and time usually wins that argument for buy.',
  s:{agent:3,neutral:5,deploy:5,gov:1,ent:1,dev:4}},
 
-truefoundry:{name:'TrueFoundry',m:'TF',c:'#4A7DFF',segs:['ain'],x:1985,y:680,dom:'truefoundry.com',slug:null,gw:true,
+truefoundry:{name:'TrueFoundry',m:'TF',c:'#4A7DFF',segs:['ain'],x:1680,y:620,dom:'truefoundry.com',slug:null,gw:true,
  tag:'The Kubernetes-native ML platform with a gateway attached.',
  pos:'ML and LLMOps platform with an AI gateway component, strong on Kubernetes-native deployment.',
  compete:'Sells to ML platform teams; the gateway rides a broader MLOps platform pitch.',
@@ -398,7 +533,7 @@ truefoundry:{name:'TrueFoundry',m:'TF',c:'#4A7DFF',segs:['ain'],x:1985,y:680,dom
  bottom:'A sensible choice for teams whose center of gravity is model operations, not a contender for the enterprise-wide agent control plane.',
  s:{agent:3,neutral:4,deploy:4,gov:2,ent:3,dev:3}},
 
-openai:{name:'OpenAI',m:'O',c:'#10A37F',segs:['mod'],x:850,y:1265,dom:'openai.com',slug:'openai',gw:false,
+openai:{name:'OpenAI',m:'O',c:'#10A37F',segs:['mod'],x:820,y:1360,dom:'openai.com',slug:'openai',gw:false,
  tag:'The gravitational center of the model market, building its own walls.',
  pos:'Frontier model leader building an agent stack (Agents SDK, enterprise tooling) around its own platform.',
  compete:'Product-led at planetary scale plus a fast-growing enterprise motion; agent tooling deepens token consumption.',
@@ -411,7 +546,7 @@ openai:{name:'OpenAI',m:'O',c:'#10A37F',segs:['mod'],x:850,y:1265,dom:'openai.co
  bottom:'A dependency to be governed, not a control plane. The more an enterprise loves OpenAI, the more it needs a neutral layer in front of it.',
  s:{agent:4,neutral:1,deploy:2,gov:2,ent:3,dev:5}},
 
-anthropic:{name:'Anthropic',m:'A',c:'#D97757',segs:['mod'],x:1065,y:1360,dom:'anthropic.com',slug:'anthropic',gw:false,
+anthropic:{name:'Anthropic',m:'A',c:'#D97757',segs:['mod'],x:1000,y:1420,dom:'anthropic.com',slug:'anthropic',gw:false,
  tag:'The safety-positioned model vendor that created MCP.',
  pos:'Frontier model vendor behind Claude and originator of MCP, the protocol the gateway market now races to manage.',
  compete:'Enterprise and API-led growth on a trust and safety narrative that lands in regulated accounts.',
@@ -424,7 +559,7 @@ anthropic:{name:'Anthropic',m:'A',c:'#D97757',segs:['mod'],x:1065,y:1360,dom:'an
  bottom:'The most governance-sympathetic model vendor, and still a model vendor. Its MCP standard is an opportunity for Gravitee, not a threat.',
  s:{agent:4,neutral:1,deploy:2,gov:3,ent:4,dev:5}},
 
-mistral:{name:'Mistral',m:'M',c:'#F2A73B',segs:['mod'],x:795,y:1350,dom:'mistral.ai',slug:'mistralai',gw:false,
+mistral:{name:'Mistral',m:'M',c:'#F2A73B',segs:['mod'],x:680,y:1280,dom:'mistral.ai',slug:'mistralai',gw:false,
  tag:'Europe\u2019s sovereignty champion in the model race.',
  pos:'French frontier model vendor with open weights and a growing platform, selling European sovereignty first.',
  compete:'Sovereignty-led sales into EU enterprises and public sector, with open-weight community goodwill.',
@@ -463,7 +598,7 @@ google:{name:'Google',m:'G',c:'#4285F4',segs:['hyp','mod'],x:1300,y:1140,dom:'cl
  bottom:'Individually strong pieces, structurally conflicted whole. The neutrality argument writes itself.',
  s:{agent:4,neutral:2,deploy:3,gov:3,ent:5,dev:4}},
 
-microsoft:{name:'Microsoft',m:'MS',c:'#5EA8F5',segs:['hyp','mod'],x:1420,y:1290,dom:'microsoft.com',slug:null,gw:true,sub:'Azure + OpenAI axis',
+microsoft:{name:'Microsoft',m:'MS',c:'#5EA8F5',segs:['hyp','mod'],x:1350,y:1300,dom:'microsoft.com',slug:null,gw:true,sub:'Azure + OpenAI axis',
  tag:'The enterprise default, selling convenience by the seat and the token.',
  pos:'Azure APIM with AI gateway features, AI Foundry, Copilot Studio, and the OpenAI axis: the widest enterprise distribution in the market.',
  compete:'EA-driven bundling and M365 pull make "just use Azure" the path of least resistance for CIOs.',
@@ -489,7 +624,7 @@ airia:{name:'Airia',m:'Ai',c:'#F26D6D',segs:['aigp'],x:1330,y:340,dom:'airia.com
  bottom:'Small today, directionally important. Where Airia shows up, the account has budget for exactly what Gravitee sells.',
  s:{agent:4,neutral:4,deploy:3,gov:5,ent:3,dev:2}},
 
-servicenow:{name:'ServiceNow',m:'SN',c:'#62D84E',segs:['aigp'],x:1150,y:180,dom:'servicenow.com',slug:null,gw:false,
+servicenow:{name:'ServiceNow',m:'SN',c:'#62D84E',segs:['aigp'],x:1080,y:200,dom:'servicenow.com',slug:null,gw:false,
  tag:'Governance as a workflow, sold to the enterprise it already runs.',
  pos:'AI Control Tower, an AIGP MQ Leader: AI risk and compliance managed as ServiceNow workflows.',
  compete:'Expands from its huge ITSM and GRC installed base with policy packs and certifications.',
@@ -502,7 +637,7 @@ servicenow:{name:'ServiceNow',m:'SN',c:'#62D84E',segs:['aigp'],x:1150,y:180,dom:
  bottom:'Owns the paperwork layer of AI governance in its accounts. The runtime layer is still open, which is exactly where Gravitee lives.',
  s:{agent:2,neutral:3,deploy:3,gov:5,ent:5,dev:2}},
 
-credo:{name:'Credo AI',m:'C',c:'#E86A9A',segs:['aigp'],x:1090,y:290,dom:'credo.ai',slug:null,gw:false,
+credo:{name:'Credo AI',m:'C',c:'#E86A9A',segs:['aigp'],x:1230,y:150,dom:'credo.ai',slug:null,gw:false,
  tag:'The policy brain looking for enforcement arms.',
  pos:'AIGP Visionary: governance as an operational workflow with intake, contextual risk scoring, and policy packs.',
  compete:'Sells to AI governance leaders and CDAOs, deliberately not chasing every security persona.',
@@ -515,7 +650,7 @@ credo:{name:'Credo AI',m:'C',c:'#E86A9A',segs:['aigp'],x:1090,y:290,dom:'credo.a
  bottom:'Smart platform, deliberately incomplete at runtime. Partner-shaped in most accounts.',
  s:{agent:2,neutral:4,deploy:2,gov:4,ent:3,dev:2}},
 
-onetrust:{name:'OneTrust',m:'OT',c:'#6DC24B',segs:['aigp'],x:1510,y:290,dom:'onetrust.com',slug:null,gw:false,
+onetrust:{name:'OneTrust',m:'OT',c:'#6DC24B',segs:['aigp'],x:1620,y:140,dom:'onetrust.com',slug:null,gw:false,
  tag:'Privacy incumbent annexing AI governance.',
  pos:'Privacy incumbent extending into AI inventory, risk classification, and EU AI Act / NIST / ISO 42001 assessments.',
  compete:'AI governance as an expansion SKU across a very large privacy installed base in NA, Europe, and APAC.',
@@ -528,7 +663,7 @@ onetrust:{name:'OneTrust',m:'OT',c:'#6DC24B',segs:['aigp'],x:1510,y:290,dom:'one
  bottom:'Will be present in every regulated account\u2019s governance discussion. Almost never in the runtime one.',
  s:{agent:2,neutral:3,deploy:3,gov:4,ent:4,dev:2}},
 
-truyo:{name:'Truyo',m:'Tr',c:'#F2916D',segs:['aigp'],x:1560,y:170,dom:'truyo.com',slug:null,gw:false,
+truyo:{name:'Truyo',m:'Tr',c:'#F2916D',segs:['aigp'],x:1430,y:120,dom:'truyo.com',slug:null,gw:false,
  tag:'The quiet Leader selling through channels.',
  pos:'AIGP MQ Leader focused on AI inventory, impact assessments, and audit-ready evidence for regulated buyers.',
  compete:'Channel-driven (70 percent-plus) into healthcare, financial services, and government.',
@@ -541,17 +676,17 @@ truyo:{name:'Truyo',m:'Tr',c:'#F2916D',segs:['aigp'],x:1560,y:170,dom:'truyo.com
  bottom:'A Leader by governance criteria, invisible at the traffic layer. Useful ammunition for the convergence narrative.',
  s:{agent:1,neutral:3,deploy:2,gov:4,ent:3,dev:1}},
 
-salesforce:{name:'Salesforce',m:'SF',c:'#00A1E0',segs:['ctx','apim'],x:480,y:560,dom:'salesforce.com',slug:'salesforce',gw:false,sub:'Agentforce + Data Cloud + MuleSoft',
- tag:'The CRM giant turning customer data into agent context.',
- pos:'Agentforce for agents, Data Cloud for context, MuleSoft for APIs: agents grounded in the customer data it already owns.',
- compete:'The largest enterprise field force selling Agentforce consumption into the installed base; its gateway play runs through MuleSoft.',
- str1:'Customer data gravity and board-level Agentforce mindshare.',
- weak1:'Agents scoped to its ecosystem; neutrality is the opposite of the strategy.',
- az:{t:'platform',n:'Deep native identity and permissioning, all of it inside Salesforce.'},
- angle:'Contain: govern Agentforce as one estate among many; MuleSoft displacement opens the door.',
- origin:'CRM and enterprise SaaS incumbent, San Francisco',buyer:'CRO-adjacent IT, existing Salesforce estates',
- pricing:'Subscription plus Agentforce consumption credits; premium',
- bottom:'A context superpower with zero interest in neutrality. Not a gateway rival in most deals, but its agents multiply the traffic that needs neutral governance.',
+salesforce:{name:'Salesforce + MuleSoft',m:'SF',c:'#00A1E0',segs:['ctx','apim'],x:560,y:620,dom:'salesforce.com',slug:'salesforce',gw:true,sub:'Agentforce · Data Cloud · Anypoint',
+ tag:'The CRM giant turning customer data into agent context, with an integration arm.',
+ pos:'One force on two fronts: Agentforce and Data Cloud own customer context, MuleSoft Anypoint and Flex Gateway hold the API and integration ground.',
+ compete:'The largest enterprise field force sells Agentforce consumption into the CRM base, with MuleSoft as the integration and gateway arm (Gartner lists Salesforce among AI gateway vendors).',
+ str1:'Customer data gravity plus a large integration installed base.',
+ weak1:'Everything optimizes toward the Salesforce ecosystem; cost and renewal friction fund displacement pipelines.',
+ az:{t:'platform',n:'Deep native identity and permissioning inside Salesforce; MuleSoft leans on it plus external IdPs.'},
+ angle:'Contain and displace: govern Agentforce as one estate among many, and lead MuleSoft displacement with cost and openness.',
+ origin:'CRM incumbent plus its 2018 MuleSoft acquisition, San Francisco',buyer:'Salesforce-committed enterprises, CRO-adjacent IT and integration teams',
+ pricing:'Premium subscriptions plus Agentforce consumption credits',
+ bottom:'A context superpower with an aging integration arm and zero interest in neutrality, which multiplies the traffic needing neutral governance.',
  s:{agent:3,neutral:1,deploy:2,gov:3,ent:5,dev:3}},
 
 databricks:{name:'Databricks',m:'DB',c:'#FF3621',segs:['ctx'],x:270,y:1090,dom:'databricks.com',slug:'databricks',gw:false,
@@ -591,11 +726,193 @@ confluent:{name:'Confluent',m:'CF',c:'#173361',segs:['ctx'],x:330,y:860,dom:'con
  origin:'Streaming platform, Kafka creators, Mountain View',buyer:'Data infrastructure and platform teams',
  pricing:'Consumption on Confluent Cloud, self-managed licenses',
  bottom:'Owns the streams that will feed the agent economy. The one context player Gravitee also meets as a straight competitor, on Kafka governance.',
- s:{agent:2,neutral:3,deploy:3,gov:3,ent:4,dev:4}}
+ s:{agent:2,neutral:3,deploy:3,gov:3,ent:4,dev:4}},
+
+apisix:{name:'Apache APISIX',m:'AX',c:'#E8434C',segs:['ain'],x:1850,y:330,dom:'apisix.apache.org',slug:null,gw:true,
+ tag:'The Apache-governed gateway substrate.',
+ pos:'Apache open source API gateway with AI gateway plugins, named by Gartner among the best-known open source options.',
+ compete:'Community-driven; commercial support arrives through API7 and cloud vendors, not the project.',
+ str1:'Performance and a large plugin ecosystem, free.',
+ weak1:'Gartner\u2019s open source caution: no commercial support or enterprise tooling from the project itself.',
+ az:{t:'byo',n:'Plugin enforcement; bring your own identity and policy engine.'},
+ angle:'Price Gravitee against the loaded cost of self-supported open source.',
+ origin:'Apache Software Foundation project',buyer:'Engineering teams choosing to build',
+ pricing:'Free, plus the payroll to run it',
+ bottom:'Capable substrate, assembly required.',
+ s:{agent:2,neutral:5,deploy:5,gov:1,ent:1,dev:4}},
+
+traefik:{name:'Traefik',m:'T',c:'#24A1C1',segs:['ain'],x:1990,y:430,dom:'traefik.io',slug:'traefikproxy',gw:true,
+ tag:'The cluster-native proxy reaching for AI.',
+ pos:'Cloud-native proxy company with Traefik Hub extending into API and AI gateway management.',
+ compete:'Huge open source proxy install base in Kubernetes clusters, converted into Hub subscriptions.',
+ str1:'Kubernetes-native ubiquity and developer familiarity.',
+ weak1:'AI and governance depth is early relative to dedicated platforms.',
+ az:{t:'partner',n:'Gateway enforcement; identity via external IdPs.'},
+ angle:'Win on governance depth, events, and enterprise readiness.',
+ origin:'Cloud-native proxy vendor, France and US',buyer:'Platform and DevOps teams',
+ pricing:'Open source core, Hub subscription',
+ bottom:'Everywhere in clusters, early in AI.',
+ s:{agent:2,neutral:4,deploy:4,gov:2,ent:2,dev:4}},
+
+vercel:{name:'Vercel',m:'V',c:'#000000',segs:['ain'],x:2080,y:540,dom:'vercel.com',slug:'vercel',gw:true,
+ tag:'The frontend cloud with a gateway for app builders.',
+ pos:'Frontend cloud with an AI SDK and AI Gateway aimed at product developers, not central IT.',
+ compete:'Bottom-up developer adoption from Next.js; the AI Gateway rides the AI SDK default path.',
+ str1:'Developer reach through Next.js and the AI SDK.',
+ weak1:'App-developer scope; enterprise estate governance is not the product.',
+ az:{t:'partner',n:'Team RBAC in the platform; enterprise identity via SSO providers.'},
+ angle:'Different buyer; relevant when product teams route around central IT.',
+ origin:'Frontend cloud, San Francisco',buyer:'Product engineering teams',
+ pricing:'Usage-based platform tiers',
+ bottom:'Owns the app-layer on-ramp to models. Its gateway solves a developer problem, not an enterprise governance one.',
+ s:{agent:3,neutral:4,deploy:2,gov:2,ent:3,dev:5}},
+
+tetrate:{name:'Tetrate',m:'Tt',c:'#3D5AFE',segs:['ain'],x:1940,y:550,dom:'tetrate.io',slug:null,gw:true,
+ tag:'Enterprise Envoy, applied to agents.',
+ pos:'Enterprise Envoy company co-maintaining Envoy AI Gateway, with an agent router service on top.',
+ compete:'Sells Envoy expertise and support to platform teams already running service mesh and gateways.',
+ str1:'Envoy credibility and upstream influence.',
+ weak1:'Infrastructure buyer only; thin business-facing governance.',
+ az:{t:'partner',n:'Envoy ext-auth enforcement; the authorization decision engine is external.'},
+ angle:'Same substrate story as Solo: win up-stack on governance and platform breadth.',
+ origin:'Envoy and Istio founders, Bay Area',buyer:'Platform and infrastructure engineering',
+ pricing:'Commercial support and platform subscriptions',
+ bottom:'Serious Envoy engineering, narrow commercial surface.',
+ s:{agent:3,neutral:4,deploy:4,gov:2,ent:3,dev:3}},
+
+nutanix:{name:'Nutanix',m:'N',c:'#024DA1',segs:['ain'],x:2280,y:400,dom:'nutanix.com',slug:null,gw:false,
+ tag:'Private AI infrastructure for the VMware-weary.',
+ pos:'Private cloud infrastructure with Nutanix Enterprise AI serving models on-prem and at the edge.',
+ compete:'Sells AI as a workload to a virtualization installed base fleeing VMware pricing.',
+ str1:'Credible on-prem and edge story for private AI.',
+ weak1:'Infrastructure layer; traffic governance and agent management are not the product.',
+ az:{t:'partner',n:'Infrastructure RBAC; identity from enterprise directories.'},
+ angle:'Complementary infrastructure: Gravitee governs the traffic on top of Nutanix-hosted models.',
+ origin:'HCI and private cloud vendor, San Jose',buyer:'Infrastructure and platform teams',
+ pricing:'Subscription per node and capacity',
+ bottom:'A place to run sovereign models, not to govern agents.',
+ s:{agent:1,neutral:4,deploy:5,gov:2,ent:4,dev:2}},
+
+bifrost:{name:'Bifrost',m:'Bf',c:'#7A5CFA',segs:['ain'],x:1950,y:660,dom:'getmaxim.ai',slug:null,gw:true,
+ tag:'The benchmark-chasing LLM gateway.',
+ pos:'High-performance open source LLM gateway from Maxim AI, pitched as a faster LiteLLM alternative.',
+ compete:'Benchmark-led developer adoption; open source funnels into Maxim\u2019s eval and observability platform.',
+ str1:'Raw gateway performance.',
+ weak1:'Very early: enterprise support, governance, and ecosystem are thin.',
+ az:{t:'byo',n:'Keys and budgets; identity is bring-your-own.'},
+ angle:'Same play as LiteLLM: great pilot, graduates to a platform.',
+ origin:'Open source project by Maxim AI',buyer:'AI engineering teams',
+ pricing:'Open source, paid platform around it',
+ bottom:'A fast proxy in a category that increasingly demands a platform.',
+ s:{agent:3,neutral:5,deploy:4,gov:1,ent:1,dev:3}},
+
+oracle:{name:'Oracle',m:'O',c:'#C74634',segs:['hyp'],x:1920,y:1330,dom:'oracle.com',slug:'oracle',gw:false,
+ tag:'The database estate selling AI next to the data.',
+ pos:'OCI with GenAI services and agents, selling AI where its database estate already lives.',
+ compete:'Database gravity plus aggressive cloud economics into existing Oracle accounts.',
+ str1:'Sovereign region options and database-adjacent AI.',
+ weak1:'Fourth-place cloud ecosystem; AI gateway and agent tooling trail the big three.',
+ az:{t:'native',n:'Native OCI IAM, scoped to Oracle Cloud.'},
+ angle:'Same boundary attack as the other hyperscalers, with a smaller boundary.',
+ origin:'Database and cloud incumbent, Austin',buyer:'Oracle-committed enterprises, database-centric IT',
+ pricing:'Cloud consumption and enterprise agreements',
+ bottom:'Relevant where the database is the center of gravity, quiet elsewhere.',
+ s:{agent:2,neutral:2,deploy:3,gov:3,ent:4,dev:2}},
+
+cloudflare:{name:'Cloudflare',m:'CF',c:'#F38020',segs:['sec'],x:1330,y:1410,dom:'cloudflare.com',slug:'cloudflare',gw:true,
+ tag:'The edge network with the easiest gateway to switch on.',
+ pos:'Global edge network selling AI Gateway, Workers AI, and AI security from its edge.',
+ compete:'Self-serve developer motion plus enterprise zero-trust deals; AI features priced to pull traffic onto the edge.',
+ str1:'Global edge footprint and effortless developer onboarding.',
+ weak1:'Edge-scoped: deep enterprise governance, events, and sovereign self-hosting are not the model.',
+ az:{t:'partner',n:'Zero-trust access policies; identity via external IdPs.'},
+ angle:'Respect the edge; win on self-hosted sovereignty and estate-wide governance.',
+ origin:'Edge network, San Francisco',buyer:'Developers up to zero-trust enterprise buyers',
+ pricing:'Self-serve tiers to enterprise contracts',
+ bottom:'The easiest gateway to turn on, and the hardest to make sovereign.',
+ s:{agent:3,neutral:4,deploy:2,gov:2,ent:4,dev:4}},
+
+lasso:{name:'Lasso Security',m:'LS',c:'#7C3AED',segs:['sec'],x:1180,y:1520,dom:'lasso.security',slug:null,gw:false,
+ tag:'The GenAI security specialist.',
+ pos:'GenAI security specialist: shadow AI discovery, LLM firewalling, and data protection.',
+ compete:'CISO-led sales on AI risk urgency, often landing before platform decisions are made.',
+ str1:'Focused LLM threat coverage moving fast.',
+ weak1:'Point solution: no traffic platform, events, or API estate behind it.',
+ az:{t:'partner',n:'Policy enforcement over existing identity; no engine of its own.'},
+ angle:'Security urgency proves the budget; consolidate the control into the platform.',
+ origin:'AI security startup, Tel Aviv',buyer:'CISO and security engineering',
+ pricing:'Platform subscription',
+ bottom:'A sharp point solution that a platform eventually absorbs.',
+ s:{agent:2,neutral:4,deploy:2,gov:3,ent:2,dev:2}},
+
+cequence:{name:'Cequence',m:'CQ',c:'#0EA5A5',segs:['sec'],x:1250,y:1630,dom:'cequence.ai',slug:null,gw:false,
+ tag:'API security extending to agent traffic.',
+ pos:'API security vendor extending discovery and protection to AI agents and MCP traffic.',
+ compete:'Security-led sales to CISOs; Gartner notes API security vendors enter this market from risk mitigation.',
+ str1:'API discovery and attack protection maturity.',
+ weak1:'Oversight posture, not a production traffic management platform (Gartner\u2019s pattern for security entrants).',
+ az:{t:'partner',n:'Enforces over existing identity infrastructure.'},
+ angle:'Coexist on protection; own routing, policy, and agent lifecycle.',
+ origin:'API security vendor, Sunnyvale',buyer:'CISO and application security teams',
+ pricing:'Platform subscription',
+ bottom:'Strong at watching traffic, not at running it.',
+ s:{agent:2,neutral:3,deploy:3,gov:3,ent:3,dev:2}},
+
+paloalto:{name:'Palo Alto Networks',m:'PA',c:'#FA582D',segs:['sec'],x:1490,y:1560,dom:'paloaltonetworks.com',slug:null,gw:false,
+ tag:'The security platform wrapping itself around enterprise AI.',
+ pos:'Security giant wrapping AI runtime security (Prisma AIRS) around enterprise AI adoption.',
+ compete:'Platform consolidation selling into the largest security budgets in the market.',
+ str1:'CISO trust and platform-scale distribution.',
+ weak1:'Secures AI traffic; does not manage, route, or govern the agent lifecycle.',
+ az:{t:'partner',n:'Enforcement over enterprise identity; not an authorization engine.'},
+ angle:'Complementary at the security layer; keep the management plane.',
+ origin:'Security incumbent, Santa Clara',buyer:'CISO, security platform owners',
+ pricing:'Enterprise security platform agreements',
+ bottom:'Will be in the account either way. The management plane is still open.',
+ s:{agent:2,neutral:3,deploy:3,gov:3,ent:5,dev:2}},
+
+langchain:{name:'LangChain',m:'LC',c:'#1C3C3C',segs:['agf','ain'],x:2250,y:680,dom:'langchain.com',slug:'langchain',gw:false,sub:'LangGraph · LangSmith',
+ tag:'The default agent framework family.',
+ pos:'The default agent framework family: LangChain, LangGraph orchestration, and LangSmith observability.',
+ compete:'Massive open source adoption converted into LangSmith and LangGraph Platform subscriptions.',
+ str1:'Ecosystem gravity: the framework enterprises already prototype with.',
+ weak1:'Frameworks build agents; they do not govern the estate running them.',
+ az:{t:'byo',n:'Application-level auth is left to the builder; the platform adds workspace roles.'},
+ angle:'Upstream ally: LangGraph builds the agents Gravitee governs in production.',
+ origin:'Open source framework turned platform, San Francisco',buyer:'AI engineering teams',
+ pricing:'Open source core, platform subscriptions',
+ bottom:'Where agents get built. The traffic they generate still needs a control plane.',
+ s:{agent:4,neutral:4,deploy:3,gov:2,ent:3,dev:5}},
+
+crewai:{name:'CrewAI',m:'CA',c:'#D94A3A',segs:['agf'],x:2290,y:850,dom:'crewai.com',slug:null,gw:false,
+ tag:'Multi-agent crews racing from framework to platform.',
+ pos:'Multi-agent orchestration framework with a fast-growing enterprise platform.',
+ compete:'Open source virality into CrewAI Enterprise; role-based agent crews as the mental model.',
+ str1:'Approachable multi-agent model with real enterprise traction.',
+ weak1:'Young platform; governance and operations depth still forming.',
+ az:{t:'byo',n:'Builder-defined auth; the enterprise tier adds RBAC.'},
+ angle:'Framework-agnostic governance: Gravitee manages crews alongside every other agent stack.',
+ origin:'Open source framework turned platform, San Francisco',buyer:'AI engineering and innovation teams',
+ pricing:'Open source core, enterprise platform',
+ bottom:'A framework racing to become a platform before platforms absorb frameworks.',
+ s:{agent:4,neutral:4,deploy:3,gov:2,ent:2,dev:4}},
+
+llamaindex:{name:'LlamaIndex',m:'LI',c:'#9C6BFF',segs:['agf'],x:2230,y:1000,dom:'llamaindex.ai',slug:null,gw:false,
+ tag:'The context pipeline for LLM applications.',
+ pos:'Data framework for LLM applications: connectors, indexing, and agents over enterprise data.',
+ compete:'Open source adoption plus LlamaCloud for managed parsing and retrieval.',
+ str1:'Best-in-class document parsing and retrieval workflows.',
+ weak1:'Data-to-LLM scope; not an agent runtime or a governance layer.',
+ az:{t:'byo',n:'Application-level; LlamaCloud adds workspace roles.'},
+ angle:'Context pipeline ally: it feeds agents the data, Gravitee governs the traffic.',
+ origin:'Open source framework, San Francisco',buyer:'AI and data engineering teams',
+ pricing:'Open source core, LlamaCloud usage',
+ bottom:'Plumbing for context, silent on control.',
+ s:{agent:3,neutral:4,deploy:3,gov:1,ent:2,dev:4}}
 };
 
 /* ================= MAP RENDER ================= */
-const WORLD_W=2600, WORLD_H=1600;
+const WORLD_W=2600, WORLD_H=1780;
 const GX=V.gravitee.x, GY=V.gravitee.y;
 
 function drawTerritories(){
@@ -616,7 +933,7 @@ function drawTerritories(){
     const dy = t.cy < GY ? -t.ry+52 : t.ry-52;
     return `<div class="tlabel" style="left:${t.cx}px;top:${t.cy+dy}px;--tc:${segColor(k)}"><h2>${t.name}</h2><div class="q">${t.quip}</div></div>`;
   }).join('');
-  lh+=`<div class="tlabel gwlab" style="left:${GWZONE.cx-430}px;top:${GWZONE.cy+180}px"><h2>AI Gateway zone</h2><div class="q">Every vendor inside ships a gateway.</div></div>`;
+  lh+=`<div class="tlabel gwlab" style="left:${GWZONE.cx-560}px;top:${GWZONE.cy+340}px"><h2>AI Gateway zone</h2><div class="q">Every vendor inside ships a gateway.</div></div>`;
   labels.innerHTML=lh;
 }
 
@@ -707,13 +1024,50 @@ window.addEventListener('resize',fitHome);
   }
 })();
 
+/* ================= SEARCH / FILTER ================= */
+function setupFilter(){
+  const seg=document.getElementById('mapseg');
+  for(const k in SEGMETA){
+    if(k==='grav') continue;
+    seg.insertAdjacentHTML('beforeend',`<option value="${k}">${SEGMETA[k].label}</option>`);
+  }
+  document.getElementById('mapsearch').addEventListener('input',applyFilter);
+  document.getElementById('mapsearch').addEventListener('keydown',e=>{if(e.key==='Enter')applyFilter(true);});
+  seg.addEventListener('change',()=>applyFilter());
+}
+function applyFilter(flyToMatch){
+  const q=document.getElementById('mapsearch').value.trim().toLowerCase();
+  const seg=document.getElementById('mapseg').value;
+  const matches=[];
+  document.querySelectorAll('#nodes .node').forEach(el=>{
+    const v=V[el.dataset.id]; if(!v) return;
+    const hit=(!q || v.name.toLowerCase().includes(q)) && (!seg || v.segs.includes(seg));
+    el.classList.toggle('dim',!hit);
+    if(hit && (q||seg)) matches.push(v);
+  });
+  if(matches.length===1 || flyToMatch===true){ const v=matches[0]; if(v) flyTo(v.x,v.y,0.9); }
+}
+
 /* ================= POPUP ================= */
+function playbook(v){
+  const dash='<span style="color:var(--mut)">—</span>';
+  const traps=(v.traps&&v.traps.length)?`<ul>${v.traps.map(t=>`<li>${t}</li>`).join('')}</ul>`:dash;
+  const objs=(v.objections&&v.objections.length)?v.objections.map(o=>`<div class="obj"><span class="atk">${o.atk}</span><br><span class="reply">${o.reply}</span></div>`).join(''):dash;
+  return `<div class="playbook">
+    <div class="phd">◆ Field playbook — use on a live call</div>
+    <div class="pbrow"><div class="pl">We win when</div><div class="pv win">${v.winwhen||dash}</div></div>
+    <div class="pbrow"><div class="pl">They win when</div><div class="pv lose">${v.losewhen||dash}</div></div>
+    <div class="pbrow"><div class="pl">Discovery traps</div><div class="pv">${traps}</div></div>
+    <div class="pbrow"><div class="pl">Objection → rebuttal</div><div class="pv">${objs}</div></div>
+  </div>`;
+}
 function openVendor(id){
   const v=V[id];
   const g=id==='gravitee';
   const tags=v.segs.map(s=>`<span class="dtag" style="color:${segColor(s)};border-color:${segColor(s)}55">${SEGMETA[s].label}</span>`).join('')
     +(v.gw?`<span class="dtag" style="color:${cssv('--grav2')};border-color:${cssv('--grav')}66">◆ AI gateway provider</span>`:'');
   const az=AZMETA[v.az.t];
+  const hasFc=!g&&(typeof FC!=='undefined'&&(FC[id]||FC_LINKS[id]));
   document.getElementById('modal').innerHTML=`
     <button class="dclose" onclick="closeModal()" aria-label="Close">✕</button>
     <div class="dhead"><span class="dlogo ${g?'dark':''}">${g?`<img src="${GLOGO}" alt="">`:logoImg(v)}</span><h3>${v.name}</h3></div>
@@ -725,15 +1079,307 @@ function openVendor(id){
     <div class="prow"><div class="pl">Main weakness</div><div class="pv">${v.weak1}</div></div>
     <div class="prow"><div class="pl">Authorization engine</div><div class="pv"><span class="azbadge" style="color:${cssv(az.color)};border-color:${cssv(az.color)}66">${az.label}</span><br>${v.az.n}</div></div>
     <div class="prow gravrow"><div class="pl">${g?'Honest self-read':'Gravitee angle'}</div><div class="pv">${v.angle}</div></div>
-    <button class="dcta" onclick="addToCompare('${id}')">Add ${v.name} to comparison</button>`;
+    ${playbook(v)}
+    ${hasFc?`<button class="dcta" onclick="viewFeatureCompare('${id}')">Gravitee vs ${v.name} — feature comparison</button>`:''}
+    <button class="dcta" onclick="addToCompare('${id}')">Add ${v.name} to comparison</button>
+    <button class="share-btn" onclick="openShare('vendor','${id}')">Share Externally</button>`;
   document.getElementById('modal').classList.add('on');
   document.getElementById('scrim').classList.add('on');
+  history.replaceState(null,'','#v='+id);
 }
 function closeModal(){
   document.getElementById('modal').classList.remove('on');
   document.getElementById('scrim').classList.remove('on');
+  if(location.hash.indexOf('#v=')===0) history.replaceState(null,'',location.pathname+location.search);
 }
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(document.getElementById('shareModal').classList.contains('on'))closeShare();else closeModal();}});
+
+/* ================= SHARE EXTERNALLY (prototype) ================= */
+const EXTERNAL_SHARE={
+  removed:[
+    'Competitive angle &amp; Gravitee win/lose framing',
+    'Honest bottom-line assessments',
+    'Main strength / weakness editorial',
+    'Field playbook (discovery traps &amp; objections)',
+    'Specific Gartner report citations',
+    'Internal &ldquo;Reading the matchup&rdquo; verdict'
+  ],
+  included:[
+    'Feature-by-feature comparison (where available)',
+    'Capability overview &amp; dimension scores',
+    'Evaluation summary'
+  ]
+};
+function canShareHeadToHead(ids){return ids&&ids.length===2&&ids.includes('gravitee')&&ids[0]!==ids[1];}
+function shareGateIds(kind,id){
+  if(kind==='vendor'){
+    if(!id||id==='gravitee') return null;
+    return ['gravitee',id];
+  }
+  if(kind==='cmp'){
+    if(!canShareHeadToHead(sel)) return null;
+    const other=sel.find(x=>x!=='gravitee');
+    return ['gravitee',other];
+  }
+  return null;
+}
+function shareGateMessage(kind){
+  if(kind==='vendor') return 'Sharing is available from a competitor&rsquo;s profile, not from Gravitee itself.';
+  if(sel.length<2) return 'Select Gravitee and one competitor to share an evaluation brief.';
+  if(!sel.includes('gravitee')) return 'Gravitee must be one of the two selected vendors.';
+  if(sel.length>2) return 'External sharing supports head-to-head only. Reduce your selection to Gravitee plus one competitor.';
+  return 'Comparison unavailable for sharing.';
+}
+function externalVerdict(vs){
+  const dimLead=k=>{const best=Math.max(...vs.map(v=>v.s[k]));return vs.filter(v=>v.s[k]===best).map(v=>v.name);};
+  const agent=dimLead('agent'),gov=dimLead('gov'),ent=dimLead('ent'),neutral=dimLead('neutral'),dep=dimLead('deploy'),dev=dimLead('dev');
+  let p=`${agent.join(' and ')} lead${agent.length>1?'':'s'} on agent and MCP depth, ${gov.join(' and ')} on governance, ${ent.join(' and ')} on enterprise readiness, and ${dev.join(' and ')} on developer adoption. ${neutral.join(' and ')} score${neutral.length>1?'':'s'} highest on ecosystem neutrality, with ${dep.join(' and ')} strongest on deployment flexibility and sovereignty support.`;
+  p+=' No single vendor leads on every dimension; the right fit depends on whether the buyer prioritizes runtime agent enforcement, ecosystem neutrality, deployment flexibility, or incumbent platform safety.';
+  return `<div class="verdict"><h3>Dimension summary</h3><p>${p}</p></div>`;
+}
+function buildExternalMethodology(){
+  const rows=DIMS.map(([k,label])=>`<div class="mrow"><div class="mk">${label}</div><div>${MEANINGS[k]}</div></div>`).join('');
+  return `<div class="method"><h3>How to read these scores</h3><div class="mbody">${rows}<div class="mnote">Each dimension is scored <b>1&ndash;5</b> (5 = strongest). Scores reflect Gravitee product and competitive analysis for evaluation discussion, informed by industry research. They are directional assessments, not vendor-published benchmarks or objective rankings.</div></div></div>`;
+}
+function buildHeadToHeadHtml(ids){
+  const vs=ids.map(i=>V[i]);
+  const title='Gravitee vs '+vs[1].name;
+  let html='<div class="cmp-scroll"><table class="cmp"><thead><tr><th></th>';
+  ids.forEach(id=>{
+    const v=V[id];
+    html+=`<th><div class="cmp-vh"><div><div class="nm">${v.name}</div><div class="sg">${v.segs.map(s=>SEGMETA[s].label).join(' · ')}${v.gw?' · ◆ gateway':''}</div></div></div></th>`;
+  });
+  html+='</tr></thead><tbody>';
+  const trow=(label,fn)=>{html+=`<tr><td>${label}</td>${vs.map(v=>`<td>${fn(v)}</td>`).join('')}</tr>`;};
+  trow('Positioning',v=>`<div class="txt">${v.pos}</div>`);
+  trow('GTM motion',v=>`<div class="txt">${v.compete}</div>`);
+  trow('Origin',v=>`<div class="txt">${v.origin}</div>`);
+  trow('Primary buyer',v=>`<div class="txt">${v.buyer}</div>`);
+  trow('Authorization engine',v=>{const az=AZMETA[v.az.t];return `<div class="txt"><span class="azbadge">${az.label}</span><br>${v.az.n}</div>`;});
+  DIMS.forEach(([k,label])=>trow(label,v=>scoreCell(v.s[k])));
+  trow('Pricing model',v=>`<div class="txt">${v.pricing}</div>`);
+  html+='</tbody></table></div>';
+  const competitorId=headToHeadCompetitorId(ids);
+  if(competitorId){
+    const fcHtml=buildFeatureCompareHtml(competitorId);
+    if(fcHtml) html+=`<div class="fc-heading">Feature comparison</div>${fcHtml}`;
+  }
+  html+=externalVerdict(vs);
+  html+=buildExternalMethodology();
+  return {title,html};
+}
+function fcStatusIconBrief(s){
+  if(s==='yes') return '<span class="b-yes">✓</span>';
+  if(s==='partial') return '<span class="b-part">!</span>';
+  return '<span class="b-no">✕</span>';
+}
+function buildCustomerFeatureBody(competitorId){
+  const fc=typeof FC!=='undefined'&&FC[competitorId];
+  if(!fc) return '';
+  const rival=V[competitorId];
+  let html='';
+  if(fc.highlights&&fc.highlights.length){
+    html+=`<div class="b-hl">${fc.highlights.map(h=>`<span>✓ ${h}</span>`).join('')}</div>`;
+  }
+  fc.sections.forEach(sec=>{
+    html+=`<div class="b-sec"><h2>${sec.title}</h2>`;
+    if(sec.subtitle) html+=`<div class="b-secsub">${sec.subtitle}</div>`;
+    if(sec.narrative) html+=`<p class="b-narr">${sec.narrative}</p>`;
+    html+=`<table class="b-feat"><thead><tr><th class="b-fcol">Capability</th><th class="b-gcol">Gravitee</th><th class="b-rcol">${rival.name}</th></tr></thead><tbody>`;
+    sec.features.forEach(f=>{
+      const gx=f.g, rx=f.r;
+      html+=`<tr><td><div class="b-fname">${f.name}</div>${f.desc?`<div class="b-fdesc">${f.desc}</div>`:''}</td>`;
+      html+=`<td><div class="b-cell">${fcStatusIconBrief(gx.s)}${gx.n?`<div class="b-note">${gx.n}</div>`:''}</div></td>`;
+      html+=`<td><div class="b-cell">${fcStatusIconBrief(rx.s)}${rx.n?`<div class="b-note">${rx.n}</div>`:''}</div></td></tr>`;
+    });
+    html+='</tbody></table></div>';
+  });
+  if(fc.conclusion){
+    html+=`<div class="b-conc"><h2>Summary</h2><p>${fc.conclusion}</p></div>`;
+  }
+  return html;
+}
+function buildCustomerScoresAppendix(g,rival){
+  const rows=DIMS.map(([k,label])=>{
+    const gn=g.s[k], rn=rival.s[k];
+    return `<div class="b-scorerow"><div class="b-slabel">${label}</div>
+      <div class="b-spair"><div class="b-sname">Gravitee</div>${scoreCellBrief(gn)}</div>
+      <div class="b-spair"><div class="b-sname">${rival.name}</div>${scoreCellBrief(rn)}</div></div>`;
+  }).join('');
+  return `<div class="b-appendix"><h2>Capability overview</h2>
+    <p class="b-appendnote">Directional 1–5 assessment for evaluation discussion. Not a vendor-published benchmark.</p>
+    <div class="b-scores">${rows}</div></div>`;
+}
+function scoreCellBrief(n){
+  return `<div class="b-bar"><i style="width:${n*20}%"></i></div><span class="b-snum">${n}/5</span>`;
+}
+function buildCustomerBriefHtml(ids){
+  const g=V.gravitee, rival=V[ids[1]];
+  const title='Gravitee vs '+rival.name;
+  const fc=typeof FC!=='undefined'&&FC[ids[1]];
+  const intro=fc?fc.intro:`How ${rival.name} compares to Gravitee for API, event, and agent management use cases.`;
+  let html=`<div class="b-hero">
+    <div class="b-vendors">
+      <div class="b-vcard b-vg"><div class="b-vlogo"><img src="${GLOGO}" alt="Gravitee"></div><div class="b-vname">Gravitee</div></div>
+      <div class="b-vs">vs</div>
+      <div class="b-vcard"><div class="b-vlogo" style="background:${rival.c}22;border-color:${rival.c}55"><span style="color:${rival.c}">${rival.m}</span></div><div class="b-vname">${rival.name}</div></div>
+    </div>
+    <p class="b-intro">${intro}</p>
+  </div>`;
+  const featBody=buildCustomerFeatureBody(ids[1]);
+  if(featBody){
+    html+=featBody;
+    html+=buildCustomerScoresAppendix(g,rival);
+  }else{
+    html+=`<div class="b-sec"><h2>Overview</h2><table class="b-feat"><thead><tr><th class="b-fcol"></th><th class="b-gcol">Gravitee</th><th class="b-rcol">${rival.name}</th></tr></thead><tbody>`;
+    const orow=(l,a,b)=>`<tr><td class="b-olabel">${l}</td><td>${a}</td><td>${b}</td></tr>`;
+    html+=orow('Positioning',g.pos,rival.pos);
+    html+=orow('Origin',g.origin,rival.origin);
+    html+=orow('Primary buyer',g.buyer,rival.buyer);
+    html+=orow('Pricing',g.pricing,rival.pricing);
+    html+='</tbody></table></div>';
+    html+=buildCustomerScoresAppendix(g,rival);
+    const dimLead=k=>{const best=Math.max(...[g,rival].map(v=>v.s[k]));return [g,rival].filter(v=>v.s[k]===best).map(v=>v.name);};
+    const agent=dimLead('agent'),gov=dimLead('gov'),ent=dimLead('ent');
+    const sum=`${agent.join(' and ')} lead on agent and MCP depth, ${gov.join(' and ')} on governance, and ${ent.join(' and ')} on enterprise readiness. The right fit depends on your priorities for runtime enforcement, ecosystem neutrality, and deployment flexibility.`;
+    html+=`<div class="b-conc"><h2>Summary</h2><p>${sum}</p></div>`;
+  }
+  return {title,html};
+}
+function openShare(kind,id){
+  const ids=shareGateIds(kind,id);
+  const blocked=!ids;
+  const subject=blocked
+    ? 'an evaluation brief'
+    : `the <b>Gravitee vs ${V[ids[1]].name}</b> comparison`;
+  const previewUrl=blocked?null:buildSafePreview(ids);
+  const removedList=EXTERNAL_SHARE.removed.map(x=>`<li>${x}</li>`).join('');
+  const includedList=EXTERNAL_SHARE.included.map(x=>`<li>${x}</li>`).join('');
+  document.getElementById('shareModal').innerHTML=`
+    <button class="dclose" onclick="closeShare()" aria-label="Close">✕</button>
+    <h3>Share externally</h3>
+    <div class="sh-sub">Generates a customer-ready comparison brief for ${subject}. Internal-only content is removed automatically.</div>
+    ${blocked?`<div class="share-gate">${shareGateMessage(kind)}</div>`:''}
+    <div class="share-strip">
+      <div class="ss-h">Removed before sharing</div>
+      <ul>${removedList}</ul>
+    </div>
+    <div class="share-strip">
+      <div class="ss-h inc">Included in customer PDF</div>
+      <ul>${includedList}</ul>
+    </div>
+    <label class="share-lbl" for="shareEmail">Customer email</label>
+    <input class="share-field" id="shareEmail" type="email" placeholder="customer@company.com" autocomplete="off" ${blocked?'disabled':''}>
+    <div class="share-err" id="shareErr"></div>
+    ${blocked?'':`<a class="share-preview" href="${previewUrl}" target="_blank" rel="noopener">Preview customer brief ↗</a>
+    <div class="share-previewnote">Open it to review before emailing the customer.</div>`}
+    <button class="share-send" onclick="sendShare()" ${blocked?'disabled':''}>Send PDF</button>`;
+  document.getElementById('shareModal').classList.add('on');
+  document.getElementById('shareScrim').classList.add('on');
+  if(!blocked) setTimeout(()=>document.getElementById('shareEmail').focus(),60);
+}
+let _sharePreviewUrl=null;
+function buildSafePreview(ids){
+  if(_sharePreviewUrl){ URL.revokeObjectURL(_sharePreviewUrl); _sharePreviewUrl=null; }
+  const {title,html}=buildCustomerBriefHtml(ids);
+  const date=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+  const doc=`<!doctype html><html><head><meta charset="utf-8">
+<title>${title}</title>
+<style>
+  *,*::before,*::after{box-sizing:border-box}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;color:#1a1410;background:#fff;margin:0;padding:0;line-height:1.5}
+  .b-page{max-width:920px;margin:0 auto;padding:48px 52px 56px}
+  .b-topbar{display:flex;align-items:center;justify-content:space-between;padding-bottom:28px;border-bottom:3px solid #FF5A2D;margin-bottom:36px}
+  .b-brand{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#FF5A2D;font-weight:800}
+  .b-date{font-size:12px;color:#8a7f74}
+  h1{font-size:32px;font-weight:800;letter-spacing:-.03em;color:#1a1410;margin:0 0 32px;line-height:1.15}
+  .b-hero{margin-bottom:36px}
+  .b-vendors{display:flex;align-items:center;justify-content:center;gap:28px;margin-bottom:24px}
+  .b-vcard{text-align:center;flex:0 0 160px}
+  .b-vlogo{width:64px;height:64px;border-radius:16px;background:#fff5f0;border:2px solid #ffd4c2;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;overflow:hidden}
+  .b-vlogo img{width:80%;height:80%;object-fit:contain}
+  .b-vlogo span{font-size:26px;font-weight:800}
+  .b-vname{font-size:17px;font-weight:800;color:#1a1410}
+  .b-vs{font-size:14px;font-weight:700;color:#c4b8ad;text-transform:uppercase;letter-spacing:.08em}
+  .b-intro{font-size:15px;line-height:1.7;color:#4a4038;text-align:center;max-width:680px;margin:0 auto}
+  .b-hl{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:22px 0 8px}
+  .b-hl span{font-size:12px;font-weight:600;padding:7px 14px;border-radius:99px;background:#edf9f3;color:#1f7a52;border:1px solid #b8e8d0}
+  .b-sec{margin-top:40px;page-break-inside:avoid}
+  .b-sec h2{font-size:20px;font-weight:800;color:#1a1410;margin:0 0 4px;letter-spacing:-.02em}
+  .b-secsub{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#FF5A2D;font-weight:700;margin-bottom:10px}
+  .b-narr{font-size:14px;line-height:1.7;color:#4a4038;margin:0 0 18px}
+  .b-feat{width:100%;border-collapse:separate;border-spacing:0;border:1px solid #e8dfd4;border-radius:12px;overflow:hidden;font-size:13px}
+  .b-feat th,.b-feat td{padding:14px 16px;text-align:left;vertical-align:top;border-bottom:1px solid #efe6db}
+  .b-feat tr:last-child td,.b-feat tr:last-child th{border-bottom:none}
+  .b-feat thead th{font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:800;color:#fff;padding:12px 16px}
+  .b-fcol{background:#f7f3ee;color:#6b6157!important;width:34%}
+  .b-gcol{background:#FF5A2D}
+  .b-rcol{background:#3d3530}
+  .b-fname{font-weight:700;font-size:13.5px;color:#1a1410;margin-bottom:3px}
+  .b-fdesc{font-size:12px;color:#8a7f74;line-height:1.5}
+  .b-olabel{font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;color:#8a7f74;width:18%}
+  .b-cell{display:flex;gap:10px;align-items:flex-start}
+  .b-yes,.b-no,.b-part{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;font-size:12px;font-weight:800;flex-shrink:0;color:#fff}
+  .b-yes{background:#2f9d6a}.b-no{background:#d64545}.b-part{background:#d4a017}
+  .b-note{font-size:12.5px;line-height:1.55;color:#4a4038;padding-top:1px}
+  .b-feat tbody td{background:#fff}
+  .b-feat tbody tr:nth-child(even) td{background:#faf7f4}
+  .b-conc{margin-top:40px;padding:28px 32px;background:linear-gradient(135deg,#fff8f5 0%,#fff 100%);border:1px solid #f0d8cc;border-radius:14px;page-break-inside:avoid}
+  .b-conc h2{font-size:18px;font-weight:800;margin:0 0 12px;color:#1a1410}
+  .b-conc p{font-size:14px;line-height:1.75;color:#4a4038;margin:0}
+  .b-appendix{margin-top:44px;padding-top:32px;border-top:1px solid #e8dfd4;page-break-inside:avoid}
+  .b-appendix h2{font-size:16px;font-weight:800;margin:0 0 6px;color:#1a1410}
+  .b-appendnote{font-size:12px;color:#8a7f74;margin:0 0 20px}
+  .b-scorerow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px 20px;padding:12px 0;border-bottom:1px solid #f0e8df;align-items:center}
+  .b-scorerow:last-child{border-bottom:none}
+  .b-slabel{font-size:12px;font-weight:700;color:#4a4038}
+  .b-spair{display:flex;align-items:center;gap:10px}
+  .b-sname{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#8a7f74;font-weight:700;width:52px;flex-shrink:0}
+  .b-bar{flex:1;height:7px;background:#efe6db;border-radius:4px;overflow:hidden;max-width:100px}
+  .b-bar i{display:block;height:100%;background:linear-gradient(90deg,#FF5A2D,#ff8a5c);border-radius:4px}
+  .b-snum{font-size:11px;color:#8a7f74;font-variant-numeric:tabular-nums;width:28px}
+  .b-foot{margin-top:48px;padding-top:20px;border-top:1px solid #e8dfd4;font-size:11px;color:#a89e94;line-height:1.65;text-align:center}
+  @media print{
+    body{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .b-page{padding:32px 40px}
+    .b-sec{page-break-inside:avoid}
+  }
+</style></head><body>
+<div class="b-page">
+  <div class="b-topbar"><div class="b-brand">Gravitee</div><div class="b-date">${date}</div></div>
+  <h1>${title}</h1>
+  ${html}
+  <div class="b-foot">Prepared by Gravitee for evaluation purposes. Capability scores are directional assessments for discussion, not vendor-published benchmarks.<br>Print this page or use Save as PDF to share.</div>
+</div>
+</body></html>`;
+  _sharePreviewUrl=URL.createObjectURL(new Blob([doc],{type:'text/html'}));
+  return _sharePreviewUrl;
+}
+function sendShare(){
+  const inp=document.getElementById('shareEmail');
+  if(!inp||inp.disabled) return;
+  const email=inp.value.trim();
+  const ok=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  if(!ok){
+    inp.classList.add('err');
+    document.getElementById('shareErr').textContent='Enter a valid email address.';
+    inp.focus();
+    return;
+  }
+  document.getElementById('shareModal').innerHTML=`
+    <button class="dclose" onclick="closeShare()" aria-label="Close">✕</button>
+    <div class="share-ok">
+      <div class="ok-mark">✓</div>
+      <div class="ok-t">Externally-safe PDF sent</div>
+      <div class="ok-sub">Comparison delivered to <b>${email.replace(/</g,'&lt;')}</b> with all internal-only content removed.</div>
+      <div class="ok-proto">Prototype — no email is actually sent and no backend is wired yet.</div>
+      <button class="share-send" onclick="closeShare()">Done</button>
+    </div>`;
+}
+function closeShare(){
+  document.getElementById('shareModal').classList.remove('on');
+  document.getElementById('shareScrim').classList.remove('on');
+}
 
 /* ================= VIEWS ================= */
 function showView(v){
@@ -749,11 +1395,13 @@ function showView(v){
 let sel=['gravitee'];
 const GROUPS=[
  ['grav',['gravitee']],
- ['apim',['kong','tyk','wso2','ibm','mulesoft']],
- ['ain',['litellm','portkey','truefoundry','solo','envoyai']],
+ ['apim',['kong','tyk','wso2','ibm','api7','boomi']],
+ ['ain',['litellm','portkey','truefoundry','solo','envoyai','apisix','traefik','vercel','tetrate','nutanix','bifrost']],
+ ['agf',['langchain','crewai','llamaindex']],
  ['mod',['openai','anthropic','mistral']],
- ['hyp',['aws','google','microsoft']],
+ ['hyp',['aws','google','microsoft','oracle']],
  ['aigp',['airia','servicenow','credo','onetrust','truyo']],
+ ['sec',['cloudflare','lasso','cequence','paloalto']],
  ['ctx',['salesforce','databricks','snowflake','confluent']]
 ];
 
@@ -770,21 +1418,87 @@ function renderPicker(){
 function toggleSel(id){
   if(sel.includes(id)) sel=sel.filter(x=>x!==id);
   else{ if(sel.length>=4){alert('Four vendors max keeps the comparison readable. Remove one first.');return;} sel.push(id); }
-  renderPicker(); renderCompare();
+  renderPicker(); renderCompare(); saveCmpState();
 }
 function addToCompare(id){
   if(!sel.includes(id)){ if(sel.length>=4) sel.shift(); sel.push(id); }
-  closeModal(); renderPicker(); renderCompare(); showView('cmp');
+  closeModal(); renderPicker(); renderCompare(); showView('cmp'); saveCmpState();
+}
+function viewFeatureCompare(id){
+  sel=['gravitee',id];
+  closeModal(); renderPicker(); renderCompare(); showView('cmp'); saveCmpState();
+  requestAnimationFrame(()=>{
+    const el=document.querySelector('.fc-wrap,.fc-linkbanner,.fc-heading');
+    if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
+  });
+}
+function saveCmpState(){
+  try{ localStorage.setItem('aml_sel',JSON.stringify(sel)); }catch(e){}
+  history.replaceState(null,'','#cmp='+sel.join(','));
 }
 
-const DIMS=[['agent','Agent & MCP depth'],['neutral','Model & ecosystem neutrality'],['deploy','Deployment flexibility & sovereignty support'],['gov','Governance & policy depth'],['ent','Enterprise readiness'],['dev','Developer adoption']];
-function scoreCell(n){return `<div class="score"><span class="sbar"><i style="width:${n*20}%"></i></span><span class="snum">${n}/5</span></div>`;}
+function renderMethodology(){
+  const rows=DIMS.map(([k,label])=>`<div class="mrow"><div class="mk">${label}</div><div>${MEANINGS[k]}</div></div>`).join('');
+  document.getElementById('method').innerHTML=
+    `<summary>How to read these scores &mdash; methodology</summary>`+
+    `<div class="mbody">${rows}`+
+    `<div class="mnote">Each dimension is scored <b>1&ndash;5</b> (5 = strongest). Scores are Gravitee&rsquo;s internal competitive assessment for this build, not vendor-published benchmarks. Use them as a directional point of view, not an objective ranking.</div></div>`;
+}
+
+/* ================= FEATURE COMPARISON (gravitee.io style) ================= */
+function fcStatusIcon(s){
+  if(s==='yes') return '<span class="fc-yes" aria-label="Yes">✓</span>';
+  if(s==='partial') return '<span class="fc-part" aria-label="Limited">!</span>';
+  return '<span class="fc-no" aria-label="No">✕</span>';
+}
+function fcVendorCol(side,feat,rivalName){
+  const x=side==='g'?feat.g:feat.r;
+  let h=fcStatusIcon(x.s);
+  if(x.n) h+=`<div class="fc-note">${x.n}</div>`;
+  return h;
+}
+function buildFeatureCompareHtml(competitorId){
+  const fc=typeof FC!=='undefined'&&FC[competitorId];
+  if(!fc){
+    const link=typeof FC_LINKS!=='undefined'&&FC_LINKS[competitorId];
+    if(!link) return '';
+    return `<div class="fc-linkbanner">Detailed feature-by-feature comparison available on <a href="${link}" target="_blank" rel="noopener">gravitee.io/comparison ↗</a></div>`;
+  }
+  const rival=V[competitorId].name;
+  let html=`<div class="fc-wrap"><div class="fc-hero"><p>${fc.intro}</p>`;
+  if(fc.highlights&&fc.highlights.length){
+    html+=`<div class="fc-hl">${fc.highlights.map(h=>`<span>✓ ${h}</span>`).join('')}</div>`;
+  }
+  html+='</div>';
+  fc.sections.forEach(sec=>{
+    html+=`<div class="fc-section"><h3>${sec.title}</h3>`;
+    if(sec.subtitle) html+=`<div class="fc-sub">${sec.subtitle}</div>`;
+    if(sec.narrative) html+=`<p class="fc-narr">${sec.narrative}</p>`;
+    html+=`<table class="fc-table"><thead><tr><th>Features</th><th>Gravitee</th><th>${rival}</th></tr></thead><tbody>`;
+    sec.features.forEach(f=>{
+      html+=`<tr><td><div class="fc-feat-name">${f.name}</div>${f.desc?`<div class="fc-feat-desc">${f.desc}</div>`:''}</td>`;
+      html+=`<td>${fcVendorCol('g',f,rival)}</td><td>${fcVendorCol('r',f,rival)}</td></tr>`;
+    });
+    html+='</tbody></table></div>';
+  });
+  if(fc.conclusion){
+    html+=`<div class="fc-conclusion"><h3>Gravitee vs ${rival}: Conclusion</h3><p>${fc.conclusion}</p></div>`;
+  }
+  html+='</div>';
+  return html;
+}
+function headToHeadCompetitorId(ids){
+  if(!ids||ids.length!==2||!ids.includes('gravitee')) return null;
+  return ids.find(id=>id!=='gravitee');
+}
 
 function renderCompare(){
   const out=document.getElementById('cmp-out');
   if(sel.length<2){out.innerHTML='<div class="cmp-empty">Select at least two vendors above to compare them side by side.</div>';return;}
   const vs=sel.map(id=>V[id]);
-  let html='<div class="cmp-scroll"><table class="cmp"><thead><tr><th></th>';
+  const canShare=canShareHeadToHead(sel);
+  let html=`<div class="cmp-topbar"><div class="ct-t">Comparing ${vs.length} vendors</div><button class="share-btn${canShare?'':' disabled'}" ${canShare?'onclick="openShare(\'cmp\')"':'disabled title="Select Gravitee and one competitor to share"'}>Share Externally</button></div>`;
+  html+='<div class="cmp-scroll"><table class="cmp"><thead><tr><th></th>';
   sel.forEach(id=>{const v=V[id];const logo=id==='gravitee'?`<img src="${GLOGO}" alt="">`:logoImg(v);
     html+=`<th><div class="cmp-vh"><span class="plogo">${logo}</span><div><div class="nm">${v.name}</div><div class="sg">${v.segs.map(s=>SEGMETA[s].label).join(' · ')}${v.gw?' · ◆ gateway':''}</div></div></div></th>`;});
   html+='</tr></thead><tbody>';
@@ -797,6 +1511,11 @@ function renderCompare(){
   trow('Pricing model',v=>`<div class="txt">${v.pricing}</div>`);
   trow('Honest bottom line',v=>`<div class="honest">${v.bottom}</div>`);
   html+='</tbody></table></div>';
+  const h2h=canShareHeadToHead(sel)?headToHeadCompetitorId(sel):null;
+  if(h2h){
+    const fcHtml=buildFeatureCompareHtml(h2h);
+    if(fcHtml) html+=`<div class="fc-heading">Feature comparison</div>${fcHtml}`;
+  }
   html+=verdict(vs);
   out.innerHTML=html;
 }
@@ -816,9 +1535,27 @@ function verdict(vs){
 }
 
 /* ================= INIT ================= */
+function initState(){
+  const h=location.hash;
+  const mc=h.match(/^#cmp=(.+)$/);
+  if(mc){
+    const ids=decodeURIComponent(mc[1]).split(',').filter(id=>V[id]);
+    if(ids.length){ sel=ids.slice(0,4); showView('cmp'); return; }
+  }
+  const mv=h.match(/^#v=([\w.-]+)$/);
+  if(mv && V[mv[1]]){ openVendor(mv[1]); return; }
+  try{
+    const saved=JSON.parse(localStorage.getItem('aml_sel')||'null');
+    if(Array.isArray(saved)){ const ids=saved.filter(id=>V[id]); if(ids.length) sel=ids.slice(0,4); }
+  }catch(e){}
+}
+
 drawTerritories();
 drawNodes();
 fitHome();
+setupFilter();
+renderMethodology();
+initState();
 renderPicker();
 renderCompare();
 </script>
