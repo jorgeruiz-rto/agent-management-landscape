@@ -12,6 +12,19 @@
     --apim:#E8A33D; --ain:#5FD3A5; --mod:#B48CF2; --hyp:#5EA8F5; --aigp:#F26D6D; --ctx:#4FC8D8; --agf:#D4E157; --sec:#E561C3;
     --r:14px;
   }
+  /* Light theme — warm cream surfaces, dark ink. Brand/category colors unchanged. */
+  :root[data-theme="light"]{
+    --bg:#FBF4ED; --panel:#FFFFFF; --panel2:#F4ECE2; --line:#E8DFD3;
+    --ink:#1E1712; --ink2:#5C5249; --mut:#8A8076;
+  }
+  /* Soften dark-tuned shadows/text-shadows on light bg */
+  :root[data-theme="light"] .ndisc{box-shadow:0 4px 14px rgba(60,40,25,.16)}
+  :root[data-theme="light"] .nlab{text-shadow:0 1px 3px rgba(255,255,255,.85)}
+  :root[data-theme="light"] .nsub{text-shadow:0 1px 2px rgba(255,255,255,.85)}
+  .themetoggle{background:var(--panel2);border:1px solid var(--line);color:var(--ink2);height:34px;padding:0 12px;border-radius:99px;cursor:pointer;font-size:12.5px;font-weight:650;display:inline-flex;align-items:center;gap:6px;transition:border-color .12s,color .12s}
+  .themetoggle .tt-ico{font-size:14px;line-height:1}
+  .themetoggle:hover{border-color:var(--grav);color:var(--ink)}
+  .themetoggle:focus-visible{outline:2px solid var(--grav2);outline-offset:2px}
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{background:var(--bg);color:var(--ink);font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased}
   ::selection{background:rgba(255,90,45,.35)}
@@ -96,7 +109,7 @@
   /* ===== POPUP ===== */
   .scrim{position:fixed;inset:0;background:rgba(5,3,2,.6);backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:opacity .18s;z-index:40}
   .scrim.on{opacity:1;pointer-events:auto}
-  .modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-46%) scale(.97);width:min(540px,94vw);max-height:88vh;overflow-y:auto;background:#141009;border:1px solid var(--line);border-radius:18px;z-index:50;padding:26px 26px 22px;opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;box-shadow:0 30px 90px rgba(0,0,0,.6)}
+  .modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-46%) scale(.97);width:min(540px,94vw);max-height:88vh;overflow-y:auto;background:var(--panel);border:1px solid var(--line);border-radius:18px;z-index:50;padding:26px 26px 22px;opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;box-shadow:0 30px 90px rgba(20,10,0,.28)}
   .modal.on{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
   .dclose{position:absolute;top:16px;right:16px;background:var(--panel2);border:1px solid var(--line);color:var(--ink2);width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:15px}
   .dclose:hover{color:var(--ink);border-color:var(--grav)}
@@ -269,6 +282,7 @@
     .prow{grid-template-columns:1fr;gap:4px}
   }
 </style>
+<script>(function(){try{var t=localStorage.getItem('amlTheme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
 </head>
 <body>
 <div class="wrap">
@@ -279,6 +293,7 @@
       <h1>Agent Management Landscape</h1>
     </div>
     <div class="hspacer"></div>
+    <button class="themetoggle" id="themeToggle" type="button" onclick="toggleTheme()" aria-label="Toggle light or dark theme" title="Toggle theme"><span class="tt-ico">☀️</span><span class="tt-lbl">Light</span></button>
     <div class="badge-int">Internal · July 2026</div>
   </header>
 
@@ -1706,6 +1721,10 @@ function initState(){
     if(Array.isArray(saved)){ const ids=saved.filter(id=>V[id]); if(ids.length) sel=ids.slice(0,4); }
   }catch(e){}
 }
+
+function updateThemeIcon(){var b=document.getElementById('themeToggle');if(!b)return;var light=document.documentElement.getAttribute('data-theme')==='light';b.querySelector('.tt-ico').textContent=light?'☀️':'🌙';b.querySelector('.tt-lbl').textContent=light?'Light':'Dark';}
+function toggleTheme(){var h=document.documentElement;var next=h.getAttribute('data-theme')==='light'?'dark':'light';h.setAttribute('data-theme',next);try{localStorage.setItem('amlTheme',next);}catch(e){}updateThemeIcon();}
+updateThemeIcon();
 
 drawTerritories();
 drawNodes();
