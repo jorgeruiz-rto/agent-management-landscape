@@ -26,9 +26,24 @@ jobs:
         uses: actions/checkout@v4
       - name: Setup Pages
         uses: actions/configure-pages@v4
-      # NOTE: HubSpot proof-point generation is intentionally NOT run here.
+      # HubSpot proof-point generation is DISABLED for public GitHub Pages.
       # GitHub Pages is public; baking real customer names + deal amounts into it
-      # would leak CRM data. Run `node hubspot-proof.js` only in a gated deploy.
+      # would leak CRM data. Re-enable the two steps below ONLY on a gated deploy
+      # (GH Enterprise Pages access control, or a host behind SSO), after adding
+      # the HUBSPOT_MCP_API_KEY secret.
+      # - name: Setup Node
+      #   uses: actions/setup-node@v4
+      #   with:
+      #     node-version: '20'
+      # - name: Refresh HubSpot proof points
+      #   env:
+      #     HUBSPOT_MCP_API_KEY: ${{ secrets.HUBSPOT_MCP_API_KEY }}
+      #   run: |
+      #     if [ -n "$HUBSPOT_MCP_API_KEY" ]; then
+      #       node hubspot-proof.js
+      #     else
+      #       echo "HUBSPOT_MCP_API_KEY not set — skipping proof-point refresh"
+      #     fi
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
