@@ -26,6 +26,9 @@ jobs:
         uses: actions/checkout@v4
       - name: Setup Pages
         uses: actions/configure-pages@v4
+      # NOTE: HubSpot proof-point generation is intentionally NOT run here.
+      # GitHub Pages is public; baking real customer names + deal amounts into it
+      # would leak CRM data. Run `node hubspot-proof.js` only in a gated deploy.
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

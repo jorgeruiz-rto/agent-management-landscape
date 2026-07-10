@@ -1,0 +1,8 @@
+.env
+.env.local
+node_modules/
+
+# Confidential CRM data (customer names + deal amounts).
+# Remove these lines ONLY once the repo is private AND hosting is access-gated.
+hubspot-proofpoints.js
+hubspot-proofpoints.json

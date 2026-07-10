@@ -11,6 +11,26 @@ To view the landscape locally:
 4. Click on any vendor to see their detailed profile and competitive analysis.
 5. Use the "Compare vendors" tab to select multiple vendors and see a side-by-side comparison.
 
+## HubSpot win proof points (internal)
+
+Each competitor profile can show the customers we won against that vendor, pulled
+from HubSpot closed-won deals (`competition` = vendor). Data is baked to a static
+`hubspot-proofpoints.js` (`window.HS = …`, loaded via `<script>`) at build time — the
+CRM key never reaches the browser, and it works even when index.html is opened by
+double-click (`file://`), where `fetch()` is blocked.
+
+Refresh before deploy:
+```bash
+HUBSPOT_MCP_API_KEY=<gravitee-gateway-key> node hubspot-proof.js
+```
+This queries the `operations-hubspot-mcp-proxy` gateway and rewrites
+`hubspot-proofpoints.js`. Keep the key in a CI secret; add the command as a step
+before the Pages deploy so data refreshes automatically. The page renders fine when
+the file is absent (shows no wins) — the `<script>` tag has an `onerror` fallback.
+
+> Contains real customer names and deal amounts. Keep this deployment access-gated
+> (internal only), not public.
+
 ## Deployment to GitHub Pages
 
 This repository is configured with a GitHub Actions workflow that automatically deploys the code to GitHub Pages on every push to the `main` branch.
